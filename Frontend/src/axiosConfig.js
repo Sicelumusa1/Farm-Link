@@ -3,7 +3,7 @@ import axios from 'axios';
 //base axios configurations
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.BACKEND_URL,
+  baseURL: process.env.BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -67,7 +67,7 @@ app.all('*', (req, res, next) => {
 // Middleware to handle errors
 app.use(errorMiddleware);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => {
   console.log(`Server started on port ${PORT} in ${process.env.NODE_ENV} mode`);
 });

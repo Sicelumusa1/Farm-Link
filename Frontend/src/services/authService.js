@@ -23,7 +23,7 @@ export const loginUser = async (userData) => {
 export const forgotPassword = async (userData) => {
   //handles sending a password reset link
   try {
-    const response = await axiosInstance.post('api/v1/forgot/password', userData);
+    const response = await axiosInstance.post('/api/v1/forgot/password', userData);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -33,7 +33,7 @@ export const forgotPassword = async (userData) => {
 export const ResetPassword = async (userData) => {
   //resets the password
   try {
-    const response = await axiosInstance.post('api/v1/password/reset/:token', userData);
+    const response = await axiosInstance.post('/api/v1/password/reset/:token', userData);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -43,7 +43,7 @@ export const ResetPassword = async (userData) => {
 export const Logout = async () => {
   //logout
   try {
-    const response = await axiosInstance.post('api/v1/logout');
+    const response = await axiosInstance.post('/api/v1/logout');
     return response.data;
   } catch (error) {
     throw error.response.data;

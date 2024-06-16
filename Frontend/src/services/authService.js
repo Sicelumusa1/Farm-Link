@@ -3,7 +3,7 @@ import axiosInstance from '../axiosConfig';
 export const registerUser = async (userData) => {
   //handles the user registration
   try {
-    const response = await axiosInstance.post('api/v1/register', userData);
+    const response = await axiosInstance.post('/api/v1/register', userData);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -13,7 +13,7 @@ export const registerUser = async (userData) => {
 export const loginUser = async (userData) => {
   //handles the user login
   try {
-    const response = await axiosInstance.post('api/v1/login', userData);
+    const response = await axiosInstance.post('/api/v1/login', userData);
     return response.data;
   } catch (error) {
     throw error.response.data;

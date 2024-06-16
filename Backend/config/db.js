@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const connectDB = () => { mongoose.connect(process.env.DB_LOCAL_URI)
+const connectDB = () => { mongoose.connect(process.env.DB_URI)
   .then(con => {
   console.log(`MongoDB database connected with host: ${con.connection.host}`);
   });

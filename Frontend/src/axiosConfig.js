@@ -3,7 +3,7 @@ import axios from 'axios';
 //base axios configurations
 
 const axiosInstance = axios.create({
-  baseURL: process.env.BACKEND_URL,
+  baseURL: 'https://farm-link.onrender.com',
   headers: {
     'Content-Type': 'application/json',
   },

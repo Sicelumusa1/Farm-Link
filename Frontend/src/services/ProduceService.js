@@ -3,7 +3,7 @@ import axiosInstance from '../axiosConfig';
 export const addCrop = async (userData) => {
   //handles adding crops to the database
     try {
-      const response = await axiosInstance.post('api/v1/profile/farm/crops', userData);
+      const response = await axiosInstance.post('/api/v1/profile/farm/crops', userData);
       return response.data;
     } catch (error) {
       throw error.response.data;
@@ -13,7 +13,7 @@ export const addCrop = async (userData) => {
 export const fetchCrops = async () => {
   //handles updating crops on the database
     try {
-      const response = await axiosInstance.get('api/v1/profile/farm/crops');
+      const response = await axiosInstance.get('/api/v1/profile/farm/crops');
       return response.data;
     } catch (error) {
       throw error.response.data;

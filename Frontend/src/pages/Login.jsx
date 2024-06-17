@@ -28,12 +28,9 @@ export default function Login() {
     //handles when the form is submited (login button is pressed)
     //form input values (ex.Name) etc will be retrieved and sent to the backend from here.
     event.preventDefault();
-    console.log('Form submitted', { email, password });
     //Passes email and password to backend for auth
     try {
       const data = await loginUser({ email, password });
-      console.log('Form submitted', { email, password });
-      console.log('login successful', data)
       if (data.role == "admin") {
         navigate("/home") //navigates to the home page after authentication
       } else if (data.role == "user") {

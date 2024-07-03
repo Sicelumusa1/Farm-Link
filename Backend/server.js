@@ -17,7 +17,7 @@ connectDB();
 
 // Permited frontend url
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: 'farm-link.gabuza.tech',
   optionsSuccessStatus: 200,
   credentials: true
 }

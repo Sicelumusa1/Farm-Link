@@ -22,3 +22,8 @@
     z-index: 0;
 }
 
+/* @media screen and (max-width: 480px) {
+    .midbit-container::after {
+        height: auto;
+    }
+} */

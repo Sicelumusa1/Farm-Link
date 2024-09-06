@@ -22,15 +22,15 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: end;
-    margin-right: 80px;
+    justify-content: space-between;
+    margin: 0 80px;
 }
 
 .nav {
     display: flex;
     flex-direction: row;
     font-size: 19px;
-    margin-right: 300px;
+    /* margin-right: 300px; */
 }
 
 .home-link-container {
@@ -87,3 +87,57 @@
     background-color: #0575e6;
     /*transition: all 0.20 ease;*/
 }
+
+/* Responsiveness */
+@media screen and (max-width: 960px) {
+    .wrapper {
+        margin-left: 20px;
+    }
+}
+@media screen and (max-width: 905px) {
+    .nav {
+        display: none;
+    }
+    .wrapper {
+        display: flex;
+        justify-content: end;
+    }
+  } 
+  
+  @media screen and (max-width: 768px) {
+    .inspiration-container {
+      max-width: 100%;
+    }
+    .councilor-role {
+      display: flex;
+      flex-direction: column;
+    }
+    .councilor-role {
+      display: flex;
+      flex-direction: column;
+    }
+  } 
+
+  @media screen and (max-width: 480px) {
+    .inspiration-container {
+      width: 100%;
+    }
+    .councilor-role {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .app-navigation {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .App-footer {
+      padding-bottom: 20px;
+    }
+    .wrapper {
+      display: none;
+    }
+  } 

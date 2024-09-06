@@ -11,13 +11,13 @@ export default function Footer() {
                 <div className="socials">
                 </div>
             </div>
-            <div className="footer-page-containers">
+            {/* <div className="footer-page-containers">
                 <div className="footer-page-title">
                     <h1>Pages</h1>
                 </div>
                 <p>Login</p>
                 <p>Register</p>
-            </div>
+            </div> */}
         </div>
     </div>
   )

@@ -17,7 +17,7 @@ connectDB();
 
 // Permited frontend url
 const corsOptions = {
-  origin: 'https://farm-link.gabuza.tech',
+  origin: 'https://farml.netlify.app',
   optionsSuccessStatus: 200,
   credentials: true
 }

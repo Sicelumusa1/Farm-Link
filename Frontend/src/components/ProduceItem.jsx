@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import '../styles/ProduceItem.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons'
@@ -13,19 +13,22 @@ export default function ProduceItem({ crop, quantityL, selectedPlantDate, select
   const [produceYield, setProduceYield] = useState(1);
   const [plotSize, setPlotSize] = useState(plot);
   const [availability, setAvailability] = useState(quantityL);
+  const isDataSent = useRef(false);
 
   useEffect(() => {
-    //Sends request to store crop data
-    const postData = async () => {
-      try {
-        const data = await addCrop({cropName, plantDate, harvestDate, produceYield, plotSize, availability})
-        console.log('crop sent')
-      } catch (err) {
-        console.log(err.message);
-      }
+    if (!isDataSent.current) {
+      const postData = async () => {
+        try {
+          const data = await addCrop({ cropName, plantDate, harvestDate, produceYield, plotSize, availability });
+          console.log('crop sent');
+        } catch (err) {
+          console.log(err.message);
+        }
+      };
+      postData();
+      isDataSent.current = true; // Mark data as sent
     }
-    postData();
-  }, [])
+  }, [cropName, plantDate, harvestDate, produceYield, plotSize, availability]);
   
 
   return (

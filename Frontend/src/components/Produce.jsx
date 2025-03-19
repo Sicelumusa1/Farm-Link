@@ -12,13 +12,15 @@ import { ThemeContext } from '../contexts/ThemeContext'
 export default function Produce() {
   const [selectedCrop, setSelectedCrop] = useState('--None--');
   const [dropDown, setDropDown] = useState(false);
-  const [quantity, setQuantity] = useState ('0');
-  const [add, setadd] = useState(false);
+  const [unitsPlanted, setUnitsPlanted] = useState('0');
+  const [add, setAdd] = useState(false);
   const [produce, setProduce] = useState([]);
   const [dropDownPlantDate, setDropDownPlantDate] = useState(false);
   const [selectedPlantDate, setSelectedPlantDate] = useState(null);
   const [selectedHarvestDate, setSelectedHarvestDate] = useState(null);
   const [plot, setPLot] = useState();
+  const [type, setType] = useState('direct sow');
+  const [image, setImage] = useState(null);
   const { theme } = useContext(ThemeContext);
 
   const handleSelect = (crop) => {
@@ -27,23 +29,42 @@ export default function Produce() {
     setDropDown(false);
   }
 
-  
-  const handleAdd = () => {
-    setadd(true)
-    const newProduce = { selectedCrop, quantity };
-    setProduce([...produce, newProduce])
-  }
+
+  const handleAdd = async () => {
+    if (selectedCrop !== '--None--' && quantity > 0 && selectedPlantDate && type && image) {
+      // const newProduce = { selectedCrop, quantity, selectedPlantDate, selectedHarvestDate, plot };
+      // setProduce([...produce, newProduce]);
+      // setadd(true);
+      const formData = new FormData();
+      formData.append('cropName', selectedCrop);
+      formData.append('plantDate', selectedPlantDate);
+      formData.append('type', type);
+      formData.append('unitsPlanted', unitsPlanted);
+      formData.append('image', image);
+
+      try {
+        const response = await fetch('profile/farm/crops', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        if (data.success) {
+          setProduce([...produce, data.data]);
+          setAdd(true);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    } else {
+      alert('Please fill all fields correctly.');
+    }
+  };
 
   return (
     <div className={`orders-container ${theme}`}>
       <div className={`orders-wrapper ${theme}`}>
         <div className={`orders-title ${theme}`}>
           <h1>Available Produce</h1>
-        </div>
-        <div className={`orders-nav-container ${theme}`}>
-          <div className={`orders-title-container ${theme}`}>
-            <p className={`Orders-nav-title ${theme}`}>Produce</p>
-          </div>
         </div>
         <div className={`order-selectors ${theme}`}>
           <div className="orders-s-crop-type-container">
@@ -52,81 +73,65 @@ export default function Produce() {
               <p>{selectedCrop}</p>
               <FontAwesomeIcon icon={faAngleUp} className="orders-arrowIcon" />
             </div>
-            {dropDown && <div className={`crop-type-dropDown ${theme}`}>
-              <p onClick={() => handleSelect("--None--")}>--None--</p>
-              <p onClick={() => handleSelect("Tomatos")}>Tomatos</p>
-              <p onClick={() => handleSelect("Mushrooms")}>Mushrooms</p>
-              <p onClick={() => handleSelect("Potates")}>Potatoes</p>
-              <p onClick={() => handleSelect("Onions")}>Onions</p>
-              <p onClick={() => handleSelect("Sprouts")}>Sprouts</p>
-              <p onClick={() => handleSelect("Pumpkins")}>Pumpkins</p>
-              <p onClick={() => handleSelect("Beans")}>Beans</p>
-              <p onClick={() => handleSelect("Spinach")}>Spinach</p>
-              <p onClick={() => handleSelect("Peppers")}>Peppers</p>
-            </div>}
+            {dropDown && (
+              <div className={`crop-type-dropDown ${theme}`}>
+                <p onClick={() => handleSelect("--None--")}>--None--</p>
+                <p onClick={() => handleSelect("Tomatoes")}>Tomatoes</p>
+                <p onClick={() => handleSelect("Mushrooms")}>Mushrooms</p>
+                <p onClick={() => handleSelect("Potatoes")}>Potatoes</p>
+                <p onClick={() => handleSelect("Onions")}>Onions</p>
+                <p onClick={() => handleSelect("Sprouts")}>Sprouts</p>
+                <p onClick={() => handleSelect("Pumpkins")}>Pumpkins</p>
+                <p onClick={() => handleSelect("Beans")}>Beans</p>
+                <p onClick={() => handleSelect("Spinach")}>Spinach</p>
+                <p onClick={() => handleSelect("Peppers")}>Peppers</p>
+              </div>
+            )}
           </div>
           <div className={`orders-s-quantity-container ${theme}`}>
-            <p className="order-s-quantity-title">Quantity</p>
+            <p className="order-s-quantity-title">Units Planted</p>
             <div className={`orders-s-quantity-btn produce-s-quantity-btn ${theme}`}>
-              <input type="number" className={`produce-s-quantity-btn-input ${theme}`} placeholder={quantity} value={quantity} onChange={(e) => setQuantity(e.target.value)} />
+              <input
+                type="number"
+                className={`produce-s-quantity-btn-input ${theme}`}
+                value={unitsPlanted}
+                onChange={(e) => setUnitsPlanted(e.target.value)}
+              />
             </div>
           </div>
           <div className="orders-s-plantDate-container">
             <p className="order-s-plantDate-title">Planted</p>
-            <div className="orders-s-plantDate-btn" onClick={() => setDropDownPlantDate((prev) => !prev)}>
-              {<Calender selectedPlantDate={selectedPlantDate} setSelectedPlantDate={setSelectedPlantDate} />}
-              <FontAwesomeIcon icon={faAngleUp} className="orders-arrowIcon2" />
+            <div className="orders-s-plantDate-btn">
+              <DatePicker
+                selected={selectedPlantDate}
+                onChange={(date) => setSelectedPlantDate(date)}
+                placeholderText="Select a date"
+                dateFormat="MM/dd/yyyy"
+                className="form-control"
+              />
             </div>
           </div>
-          <div className="orders-s-harvestDate-container">
-            <p className="order-s-harvestDate-title">Havested</p>
-            <div className="orders-s-harvestDate-btn" onClick={() => setDropDownPlantDate((prev) => !prev)}>
-              <div className="calender-container">
-                <DatePicker
-                  selected={selectedHarvestDate}
-                  onChange={(date) => setSelectedHarvestDate(date)}
-                  placeholderText="Select a date"
-                  dateFormat="MM/dd/yyyy"
-                  className="form-control"
-                />
-              </div>
-              <FontAwesomeIcon icon={faAngleUp} className="orders-arrowIcon2" />
-            </div>
+          <div className="orders-s-type-container">
+            <p className="order-s-type-title">Type</p>
+            <select value={type} onChange={(e) => setType(e.target.value)}>
+              <option value="direct sow">Direct Sow</option>
+              <option value="transplant">Transplant</option>
+            </select>
           </div>
-          <div className="orders-s-quantity-container plot-size">
-            <p className="order-s-quantity-title">Plot Size</p>
-            <div className={`orders-s-quantity-btn ${theme}`}>
-              <input type="number" placeholder={plot} value={plot} onChange={(e) => setPLot(e.target.value)} required />
-            </div>
+          <div className="orders-s-image-container">
+            <p className="order-s-image-title">Image</p>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImage(e.target.files[0])}
+            />
           </div>
         </div>
-        <div className={`add-produce-container ${theme}`} onClick={() => handleAdd(true)}>
+        <div className={`add-produce-container ${theme}`} onClick={handleAdd}>
           <FontAwesomeIcon icon={faCirclePlus} className={`add-produceIcon ${theme}`} />
           <p>Add</p>
         </div>
       </div>
-      <div className="produce-form-container">
-        <div className="produce-title-container">
-          <p className="produce-title-produce">Produce</p>
-          <div className="product-title-produce-container">
-            <p className="produce-title-quantity">Quantity</p>
-          </div>
-        </div>
-        <div className="order-output-container">
-          {add && produce.map((item, key) => (
-            item.selectedCrop != '--None--' && item.quantity > 0 && selectedPlantDate && selectedHarvestDate && plot ? 
-              (
-              <ProduceItem 
-                key={key} 
-                crop={item.selectedCrop} 
-                quantityL={item.quantity} 
-                selectedPlantDate={selectedPlantDate} 
-                selectedHarvestDate={selectedHarvestDate} 
-                plot={plot}/>
-              ): null
-          ))}
-        </div>
-      </div>
     </div>
-  )
+  );
 }

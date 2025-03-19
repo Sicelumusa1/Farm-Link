@@ -29,7 +29,7 @@ export default function Produce() {
     if (selectedCrop !== '--None--' && unitsPlanted > 0 && selectedPlantDate && type && image) {
       const formData = new FormData();
       formData.append('cropName', selectedCrop);
-      formData.append('plantDate', selectedPlantDate);
+      formData.append('plantDate', selectedPlantDate.toISOString());
       formData.append('type', type);
       formData.append('unitsPlanted', unitsPlanted);
       formData.append('image', image);
@@ -40,6 +40,14 @@ export default function Produce() {
           setProduce([...produce, response.data]); // Add the new crop to the list
           setAdd(true);
           alert('Crop added successfully!');
+
+          // Reset form fields
+          setSelectedCrop('--None--');
+          setUnitsPlanted(0);
+          setSelectedPlantDate(null);
+          setType('direct sow');
+          setImage(null);
+
         }
       } catch (error) {
         console.error('Error adding crop:', error);
@@ -121,7 +129,7 @@ export default function Produce() {
             {selectedCrop !== '--None--' && (
               <div className={`guidelines-btn ${theme}`} onClick={() => setShowGuidelines(true)}>
                 <FontAwesomeIcon icon=
-                {faInfoCircle} className='guidelines-icon' />
+                  {faInfoCircle} className='guidelines-icon' />
                 <p>Guidelines</p>
               </div>
             )}
@@ -154,7 +162,7 @@ export default function Produce() {
         </div>
       </div>
       {showGuidelines && (
-        <CropGuidelinesPopup 
+        <CropGuidelinesPopup
           crop={selectedCrop}
           onClose={() => setShowGuidelines(false)}
         />

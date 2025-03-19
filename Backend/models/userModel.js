@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Farm'
   },
+  hasProvidedFarmDetails: {
+    type: Boolean,
+    default: false,
+  },
   lastVisited: {
     type: Date
   },

@@ -1,6 +1,6 @@
 import '../styles/Home.css'
 import HeaderSignIn from '../components/HeaderSignIn'
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import Profile from '../components/Profile'
 import SideBarFarmer from '../components/SideBarFarmer'
 import Produce from '../components/Produce'
@@ -12,13 +12,27 @@ import { FarmPopUp } from '../components/FarmPopUp'
 export default function HomeFarmer() {
   const [navItem, setNavItem] = useState('profile');
   const { theme } = useContext(ThemeContext);
-  const [popUp, setPopUp] = useState(true);
+  const [popUp, setPopUp] = useState(false);
   const { user } = useContext(UserContext);
   const [coordinates, setCoordinates] = useState({ "latitude": "", "longitude": ""});
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
 
+  useEffect(() => {
+    // Fetch use data and check if farm details have been provided
+    const fetchUserData = async () => {
+      try {
+        const userData = await profile();
+        if (userData.data && !userData.data.hasProvidedFarmDetails) {
+          setPopUp(true); // Show popup if farm details are not provided
+        }
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+      }
+    };
 
+    fetchUserData();
+  }, []);
 
   const handleGetLocation = () => {
     //Pops up prompt for allowing App to get user's current location

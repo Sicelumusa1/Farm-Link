@@ -46,15 +46,20 @@ const updateFarm = catchAsyncErrors(async (req, res, next) => {
     }
   
     // Update the farm document
-    const farm = await Farm.findByIdAndUpdate(
-      user.farm._id,
-      { name, location, streetName, houseNumber, city, farmSize, coordinates },
-      { new: true, runValidators: true }
+    const farm = await Farm.findOneAndUpdate(
+      { user: userId },
+      { location, streetName, houseNumber, city, farmSize, coordinates },
+      { new: true }
     );
+  
+    // Update user's hasProvidedFarmDetails field
+    await User.findByIdAndUpdate(userId, { hasProvidedFarmDetails: true });
+  
   
     res.status(200).json({
       success: true,
-      data: farm
+      data: farm,
+      message: 'Farm details updated successfully'
     });
   });
 

@@ -8,43 +8,39 @@ const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 // Allow user to add a new crop
 const addCrop = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user.id;
-  const { cropName, plantDate, type, unitsPlanted, produceYield, plotSize } = req.body;
+  const { cropName, plantDate, type, unitsPlanted } = req.body;
+  const image = req.file;
+
+  console.log('Request Body:', req.body);
+  console.log('Uploaded Image:', image);
 
   const user = await User.findById(userId).populate('farm');
   if (!user) {
-      return next(new ErrorHandler('User not found', 404));
+    return next(new ErrorHandler('User not found', 404));
   }
 
   if (!user.farm) {
-      return next(new ErrorHandler('User does not have a farm', 400));
+    return next(new ErrorHandler('User does not have a farm', 400));
   }
 
   const farm = await Farm.findById(user.farm);
   if (!farm) {
-      return next(new ErrorHandler('Farm not found', 404));
+    return next(new ErrorHandler('Farm not found', 404));
   }
 
   // Check if all required fields are provided
-  if (!cropName || !plantDate || !type || !unitsPlanted || !produceYield || !plotSize) {
-      return next(new ErrorHandler('Please fill in all the required fields', 400));
-  }
-
-  // Handle image upload
-  const imageUrl = req.file ? req.file.path : null; // Path to the uploaded image
-  if (!imageUrl) {
-      return next(new ErrorHandler('Image is required', 400));
+  if (!cropName || !plantDate || !type || !unitsPlanted || !image) {
+    return next(new ErrorHandler('Please fill in all the required fields', 400));
   }
 
   // Create a new crop document
   const crop = await Crop.create({
-      farm: farm._id,
-      cropName,
-      plantDate,
-      type,
-      unitsPlanted,
-      images: [{ url: imageUrl, growthStage: 'planting' }], // Initial image for planting stage
-      produceYield,
-      plotSize
+    farm: farm._id,
+    cropName,
+    plantDate,
+    type,
+    unitsPlanted,
+    images: [{ url: image.path, growthStage: 'planting' }], // Save the image path
   });
 
   // Add the crop's ObjectId to the farm's crop array
@@ -53,9 +49,9 @@ const addCrop = catchAsyncErrors(async (req, res, next) => {
 
   // Send response with the new crop details
   res.status(201).json({
-      success: true,
-      data: crop,
-      message: 'Crop was successfully added!'
+    success: true,
+    data: crop,
+    message: 'Crop was successfully added!'
   });
 });
 

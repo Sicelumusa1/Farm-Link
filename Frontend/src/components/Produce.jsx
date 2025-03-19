@@ -1,40 +1,30 @@
-import React, { useContext, useState } from 'react'
-import '../styles/Order.css'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleUp, faCirclePlus } from '@fortawesome/free-solid-svg-icons'
-import ProduceItem from './ProduceItem'
-import Calender from './Calender'
+// import React, { useContext, useState } from 'react';
+import '../styles/Order.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleUp, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../styles/Calender.css'
-import { ThemeContext } from '../contexts/ThemeContext'
+import { ThemeContext } from '../contexts/ThemeContext';
+import { addCrop } from '../services/ProduceService'; // Import the addCrop function
 
 export default function Produce() {
   const [selectedCrop, setSelectedCrop] = useState('--None--');
   const [dropDown, setDropDown] = useState(false);
-  const [unitsPlanted, setUnitsPlanted] = useState('0');
+  const [unitsPlanted, setUnitsPlanted] = useState(0);
   const [add, setAdd] = useState(false);
   const [produce, setProduce] = useState([]);
-  const [dropDownPlantDate, setDropDownPlantDate] = useState(false);
   const [selectedPlantDate, setSelectedPlantDate] = useState(null);
-  const [selectedHarvestDate, setSelectedHarvestDate] = useState(null);
-  const [plot, setPLot] = useState();
   const [type, setType] = useState('direct sow');
   const [image, setImage] = useState(null);
   const { theme } = useContext(ThemeContext);
 
   const handleSelect = (crop) => {
-    //stores selected crop to state
     setSelectedCrop(crop);
     setDropDown(false);
-  }
-
+  };
 
   const handleAdd = async () => {
-    if (selectedCrop !== '--None--' && quantity > 0 && selectedPlantDate && type && image) {
-      // const newProduce = { selectedCrop, quantity, selectedPlantDate, selectedHarvestDate, plot };
-      // setProduce([...produce, newProduce]);
-      // setadd(true);
+    if (selectedCrop !== '--None--' && unitsPlanted > 0 && selectedPlantDate && type && image) {
       const formData = new FormData();
       formData.append('cropName', selectedCrop);
       formData.append('plantDate', selectedPlantDate);
@@ -43,17 +33,15 @@ export default function Produce() {
       formData.append('image', image);
 
       try {
-        const response = await fetch('profile/farm/crops', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await response.json();
-        if (data.success) {
-          setProduce([...produce, data.data]);
+        const response = await addCrop(formData); // Use the addCrop service
+        if (response.success) {
+          setProduce([...produce, response.data]); // Add the new crop to the list
           setAdd(true);
+          alert('Crop added successfully!');
         }
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error('Error adding crop:', error);
+        alert('Failed to add crop. Please try again.');
       }
     } else {
       alert('Please fill all fields correctly.');
@@ -75,16 +63,16 @@ export default function Produce() {
             </div>
             {dropDown && (
               <div className={`crop-type-dropDown ${theme}`}>
-                <p onClick={() => handleSelect("--None--")}>--None--</p>
-                <p onClick={() => handleSelect("Tomatoes")}>Tomatoes</p>
-                <p onClick={() => handleSelect("Mushrooms")}>Mushrooms</p>
-                <p onClick={() => handleSelect("Potatoes")}>Potatoes</p>
-                <p onClick={() => handleSelect("Onions")}>Onions</p>
-                <p onClick={() => handleSelect("Sprouts")}>Sprouts</p>
-                <p onClick={() => handleSelect("Pumpkins")}>Pumpkins</p>
-                <p onClick={() => handleSelect("Beans")}>Beans</p>
-                <p onClick={() => handleSelect("Spinach")}>Spinach</p>
-                <p onClick={() => handleSelect("Peppers")}>Peppers</p>
+                <p onClick={() => handleSelect('--None--')}>--None--</p>
+                <p onClick={() => handleSelect('Tomatoes')}>Tomatoes</p>
+                <p onClick={() => handleSelect('Mushrooms')}>Mushrooms</p>
+                <p onClick={() => handleSelect('Potatoes')}>Potatoes</p>
+                <p onClick={() => handleSelect('Onions')}>Onions</p>
+                <p onClick={() => handleSelect('Sprouts')}>Sprouts</p>
+                <p onClick={() => handleSelect('Pumpkins')}>Pumpkins</p>
+                <p onClick={() => handleSelect('Beans')}>Beans</p>
+                <p onClick={() => handleSelect('Spinach')}>Spinach</p>
+                <p onClick={() => handleSelect('Peppers')}>Peppers</p>
               </div>
             )}
           </div>
@@ -95,7 +83,7 @@ export default function Produce() {
                 type="number"
                 className={`produce-s-quantity-btn-input ${theme}`}
                 value={unitsPlanted}
-                onChange={(e) => setUnitsPlanted(e.target.value)}
+                onChange={(e) => setUnitsPlanted(Number(e.target.value))}
               />
             </div>
           </div>
@@ -130,6 +118,27 @@ export default function Produce() {
         <div className={`add-produce-container ${theme}`} onClick={handleAdd}>
           <FontAwesomeIcon icon={faCirclePlus} className={`add-produceIcon ${theme}`} />
           <p>Add</p>
+        </div>
+      </div>
+      <div className="produce-form-container">
+        <div className="produce-title-container">
+          <p className="produce-title-produce">Produce</p>
+          <div className="product-title-produce-container">
+            <p className="produce-title-quantity">Quantity</p>
+          </div>
+        </div>
+        <div className="order-output-container">
+          {add &&
+            produce.map((item, index) => (
+              <ProduceItem
+                key={index}
+                crop={item.cropName}
+                quantityL={item.unitsPlanted}
+                selectedPlantDate={item.plantDate}
+                type={item.type}
+                image={item.images[0]?.url} // Pass the image URL
+              />
+            ))}
         </div>
       </div>
     </div>

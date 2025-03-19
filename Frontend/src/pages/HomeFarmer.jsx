@@ -10,7 +10,7 @@ import { UserContext } from '../contexts/UserContext'
 import { FarmPopUp } from '../components/FarmPopUp'
 
 export default function HomeFarmer() {
-  const [navItem, setNavItem] = useState('profile');
+  const [navItem, setNavItem] = useState('produce');
   const { theme } = useContext(ThemeContext);
   const [popUp, setPopUp] = useState(false);
   const { user } = useContext(UserContext);

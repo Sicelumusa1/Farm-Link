@@ -15,15 +15,26 @@ const cropSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    harvestDate: {
-        type: Date,
+    type: {
+        type: String,
+        enum: ['direct sow', 'transplant'],
         required: true
     },
-    produceYield: {
+    unitsPlanted: {
         type: Number,
         required: true
     },
-    availability: {
+    images: [{
+        url: {
+            type: String,
+            required: true
+        },
+        growthStage: {
+            type: String,
+            required: true
+        }
+    }],
+    produceYield: {
         type: Number,
         required: true
     },

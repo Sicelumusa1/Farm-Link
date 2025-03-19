@@ -32,7 +32,7 @@ export default function Produce() {
       formData.append('plantDate', selectedPlantDate.toISOString());
       formData.append('type', type);
       formData.append('unitsPlanted', unitsPlanted);
-      formData.append('image', image);
+      // formData.append('image', image);
 
       try {
         const response = await addCrop(formData); // Use the addCrop service
@@ -46,7 +46,7 @@ export default function Produce() {
           setUnitsPlanted(0);
           setSelectedPlantDate(null);
           setType('direct sow');
-          setImage(null);
+          // setImage(null);
 
         }
       } catch (error) {
@@ -116,7 +116,7 @@ export default function Produce() {
               <option value="transplant">Transplant</option>
             </select>
           </div>
-          <div className="orders-s-image-container">
+          {/* <div className="orders-s-image-container">
             <p className="order-s-image-title">Image</p>
             <input
               type="file"
@@ -124,7 +124,7 @@ export default function Produce() {
               onChange={(e) => setImage(e.target.files[0])}
             />
             <p>Upload Image</p>
-          </div>
+          </div> */}
           <div className="guidelines-btn-container">
             {selectedCrop !== '--None--' && (
               <div className={`guidelines-btn ${theme}`} onClick={() => setShowGuidelines(true)}>
@@ -156,7 +156,7 @@ export default function Produce() {
                 quantityL={item.unitsPlanted}
                 selectedPlantDate={item.plantDate}
                 type={item.type}
-                image={item.images[0]?.url} // Pass the image URL
+                // image={item.images[0]?.url} // Pass the image URL
               />
             ))}
         </div>

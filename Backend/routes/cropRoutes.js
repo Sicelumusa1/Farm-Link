@@ -8,8 +8,8 @@ const { addCrop, updateCrop, getCrops } = require('../controllers/cropController
 
 router.use(cookieJwtAuth);
 
-router.route('/profile/farm/crops').post(upload.single("image"), addCrop);
+router.route('/profile/farm/crops').post(addCrop);
 router.route('/profile/farm/crops').get(getCrops);
-router.route('/profile/farm/crops/:cropId').put(upload.single("image"), updateCrop);
+router.route('/profile/farm/crops/:cropId').put(updateCrop);
 
 module.exports = router;

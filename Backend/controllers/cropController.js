@@ -9,10 +9,10 @@ const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 const addCrop = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user.id;
   const { cropName, plantDate, type, unitsPlanted } = req.body;
-  const image = req.file;
+  // const image = req.file;
 
-  console.log('Request Body:', req.body);
-  console.log('Uploaded Image:', image);
+  // console.log('Request Body:', req.body);
+  // console.log('Uploaded Image:', image);
 
   const user = await User.findById(userId).populate('farm');
   if (!user) {
@@ -29,7 +29,7 @@ const addCrop = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Check if all required fields are provided
-  if (!cropName || !plantDate || !type || !unitsPlanted || !image) {
+  if (!cropName || !plantDate || !type || !unitsPlanted) {
     return next(new ErrorHandler('Please fill in all the required fields', 400));
   }
 
@@ -40,7 +40,7 @@ const addCrop = catchAsyncErrors(async (req, res, next) => {
     plantDate,
     type,
     unitsPlanted,
-    images: [{ url: image.path, growthStage: 'planting' }], // Save the image path
+    // images: [{ url: image.path, growthStage: 'planting' }], 
   });
 
   // Add the crop's ObjectId to the farm's crop array

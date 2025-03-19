@@ -320,6 +320,34 @@
   .add-produceIcon.dark {
     color: #efefef;
   }
+  .guidelines-btn-container {
+    margin-top: 10px;
+  }
+  .guidelines-btn {
+    width: 120px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #D9D9D9;
+    border-radius: 7px;
+    cursor: pointer;
+    background-color: #ffffff;
+    color: #585858;
+  }
+  .guidelines-btn.dark {
+    background-color: #212121;
+    color: #efefef;
+  }
+  .guidelines-btn:hover {
+    background-color: #0575e6;
+    color: #ffffff;
+  }
+  .guidelines-icon {
+    margin-right: 5px;
+  }
+
+
 .orders-s-crop-type-btn.dark, .orders-s-plantDate-btn.dark {
     width: 180px;
 }

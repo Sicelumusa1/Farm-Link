@@ -1,11 +1,12 @@
 import React, { useContext, useState } from 'react';
 import '../styles/Order.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleUp, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { faAngleUp, faCirclePlus, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ThemeContext } from '../contexts/ThemeContext';
-import { addCrop } from '../services/ProduceService'; // Import the addCrop function
+import { addCrop } from '../services/ProduceService';
+import CropGuidelinesPopup from './CropGuidelinesPopup';
 
 export default function Produce() {
   const [selectedCrop, setSelectedCrop] = useState('--None--');
@@ -16,6 +17,7 @@ export default function Produce() {
   const [selectedPlantDate, setSelectedPlantDate] = useState(null);
   const [type, setType] = useState('direct sow');
   const [image, setImage] = useState(null);
+  const [showGuidelines, setShowGuidelines] = useState(false);
   const { theme } = useContext(ThemeContext);
 
   const handleSelect = (crop) => {
@@ -113,6 +115,16 @@ export default function Produce() {
               accept="image/*"
               onChange={(e) => setImage(e.target.files[0])}
             />
+            <p>Upload Image</p>
+          </div>
+          <div className="guidelines-btn-container">
+            {selectedCrop !== '--None--' && (
+              <div className={`guidelines-btn ${theme}`} onClick={() => setShowGuidelines(true)}>
+                <FontAwesomeIcon icon=
+                {faInfoCircle} className='guidelines-icon' />
+                <p>Guidelines</p>
+              </div>
+            )}
           </div>
         </div>
         <div className={`add-produce-container ${theme}`} onClick={handleAdd}>
@@ -141,6 +153,12 @@ export default function Produce() {
             ))}
         </div>
       </div>
+      {showGuidelines && (
+        <CropGuidelinesPopup 
+          crop={selectedCrop}
+          onClose={() => setShowGuidelines(false)}
+        />
+      )}
     </div>
   );
 }

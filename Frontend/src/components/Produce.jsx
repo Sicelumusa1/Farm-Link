@@ -1,4 +1,4 @@
-// import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import '../styles/Order.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleUp, faCirclePlus } from '@fortawesome/free-solid-svg-icons';

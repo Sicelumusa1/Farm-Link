@@ -67,7 +67,7 @@ export default function Produce() {
               <div className={`crop-type-dropDown ${theme}`}>
                 <p onClick={() => handleSelect('--None--')}>--None--</p>
                 <p onClick={() => handleSelect('Tomatoes')}>Tomatoes</p>
-                <p onClick={() => handleSelect('Mushrooms')}>Mushrooms</p>
+                <p onClick={() => handleSelect('Cabbage')}>Cabbage</p>
                 <p onClick={() => handleSelect('Potatoes')}>Potatoes</p>
                 <p onClick={() => handleSelect('Onions')}>Onions</p>
                 <p onClick={() => handleSelect('Sprouts')}>Sprouts</p>

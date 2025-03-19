@@ -10,7 +10,7 @@ const CropGuidelinesPopup = (crop, onClose) => {
       irrigation: 'Regular and uniform soil moisture',
       pesticide: 'Regular spraying against major pests'
     },
-    Tomato: {
+    Tomatoes: {
       spacing: 'Row 500-900 mm, 300-600 mm within-row',
       fertilization: '2:3:4 fertilizer, nitrogen side dressing',
       irrigation: 'Regular and uniform soil moisture',

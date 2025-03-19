@@ -26,7 +26,7 @@ export default function Produce() {
   };
 
   const handleAdd = async () => {
-    if (selectedCrop !== '--None--' && unitsPlanted > 0 && selectedPlantDate && type && image) {
+    if (selectedCrop !== '--None--' && unitsPlanted > 0 && selectedPlantDate && type) {
       const formData = new FormData();
       formData.append('cropName', selectedCrop);
       formData.append('plantDate', selectedPlantDate.toISOString());

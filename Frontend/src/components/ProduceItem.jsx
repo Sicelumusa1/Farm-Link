@@ -51,8 +51,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 export default function ProduceItem({ crop, quantityL, selectedPlantDate, type }) {
+  
   return (
     <div className="produceItem-container">
+      <div className="produce-item-title">
+          <p>Name</p>
+          <p>Date Planted</p>
+          <p>Type</p>
+          <p>Growth Stage</p>
+          <p>Available</p>
+        </div>
+        <br/>
+       <hr />
       <div className="produceItem">
         <FontAwesomeIcon icon={faAngleUp} className="produce-arrowIcon" />
         <div className="produceName">

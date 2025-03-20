@@ -50,7 +50,7 @@ import '../styles/ProduceItem.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
-export default function ProduceItem({ crop, quantityL, selectedPlantDate, type, image }) {
+export default function ProduceItem({ crop, quantityL, selectedPlantDate, type }) {
   return (
     <div className="produceItem-container">
       <div className="produceItem">
@@ -65,11 +65,6 @@ export default function ProduceItem({ crop, quantityL, selectedPlantDate, type, 
           <p>Planted: {new Date(selectedPlantDate).toLocaleDateString()}</p>
           <p>Type: {type}</p>
         </div>
-        {image && (
-          <div className="produceImageContainer">
-            <img src={image} alt="Crop" className="produceImage" />
-          </div>
-        )}
       </div>
     </div>
   );

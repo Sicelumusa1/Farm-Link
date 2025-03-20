@@ -9,11 +9,7 @@ const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 const addCrop = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user.id;
   const { cropName, plantDate, type, unitsPlanted } = req.body;
-  // const image = req.file;
-
-  // console.log('Request Body:', req.body);
-  // console.log('Uploaded Image:', image);
-
+  
   const user = await User.findById(userId).populate('farm');
   if (!user) {
     return next(new ErrorHandler('User not found', 404));
@@ -40,7 +36,6 @@ const addCrop = catchAsyncErrors(async (req, res, next) => {
     plantDate,
     type,
     unitsPlanted,
-    // images: [{ url: image.path, growthStage: 'planting' }], 
   });
 
   // Add the crop's ObjectId to the farm's crop array

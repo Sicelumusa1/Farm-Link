@@ -131,10 +131,15 @@ export default function Produce() {
       </div>
       <div className="produce-form-container">
         <div className="produce-title-container">
-          <p className="produce-title-produce">Produce</p>
-          <div className="product-title-produce-container">
-            <p className="produce-title-quantity">Quantity</p>
-          </div>
+        <div className="produce-item-title">
+          <p>Name</p>
+          <p>Date Planted</p>
+          <p>Type</p>
+          <p>Growth Stage</p>
+          <p>Available</p>
+        </div>
+        <br/>
+       <hr />
         </div>
         <div className="order-output-container">
           {add &&

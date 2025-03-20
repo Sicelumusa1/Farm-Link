@@ -346,6 +346,17 @@
   .guidelines-icon {
     margin-right: 5px;
   }
+  .produce-title-container hr {
+    height: 1px;
+    background-color: #e2e2e2;
+    border: none;
+  }
+.produce-item-title {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr;
+    align-items: center;
+    font-size: max(1vw,12px);
+  }
 
 
 .orders-s-crop-type-btn.dark, .orders-s-plantDate-btn.dark {

@@ -17,10 +17,10 @@ export default function Profile({handleGetLocation, coordinates}) {
         </div>
         <div className={`members-nav-container ${theme}`}>
           {<div className={selected == 'history' ? (`recent-container2 ${theme}`) : (`recent-container ${theme}`)} onClick={() => setSelected('history')}>
-            <p className={`members-recent-title ${theme}`}>History</p>
+            <p className={`members-recent-title ${theme}`}> Order History</p>
           </div>}
           {<div className={selected == 'details' ? (`application-container2 ${theme}`) : (`application-container ${theme}`)} onClick={() => setSelected('details')}>
-            <p className={`members-application-title ${theme}`}>Details</p>
+            <p className={`members-application-title ${theme}`}>Profile Details</p>
           </div>}
         </div>
         {selected == 'history' && <History />}

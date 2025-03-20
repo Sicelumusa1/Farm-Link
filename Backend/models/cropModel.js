@@ -24,24 +24,19 @@ const cropSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    // images: [{
-    //     url: {
-    //         type: String,
-    //         required: true
-    //     },
-    //     growthStage: {
-    //         type: String,
-    //         required: true
-    //     }
-    // }],
-    // produceYield: {
-    //     type: Number,
-    //     required: true
-    // },
-    // plotSize: {
-    //     type: Number,
-    //     required: true
-    // },
+    images: [{
+        url: {
+            type: String,
+       },
+        growthStage: {
+            type: String,
+        }
+    }],
+    produceYield: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     orders: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Order',

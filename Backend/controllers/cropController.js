@@ -36,6 +36,8 @@ const addCrop = catchAsyncErrors(async (req, res, next) => {
     plantDate,
     type,
     unitsPlanted,
+    growthStage: 'Planting',
+    produceYield: 0
   });
 
   // Add the crop's ObjectId to the farm's crop array

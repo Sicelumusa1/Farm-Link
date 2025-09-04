@@ -7,3 +7,12 @@
 .env
 /Frontend/.env
 /Backend/.env
+
+# IDE / Editor junk
+.metals/
+.theia/
+.vscode/
+.idea/
+
+# Vite temp/cache files
+*.timestamp-*.mjs

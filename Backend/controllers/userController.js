@@ -1,148 +1,155 @@
-// Logic for user-related operations
-const Farm = require('../models/farmModel');
-const User = require('../models/userModel');
 
-const ErrorHandler = require('../utils/errorHandler');
+const User = require('../models/userModel');
+const { oracledb } = require('../config/db');
+const bcrypt = require('bcryptjs');
 const catchAsyncErrors = require('../middleware/catchAsyncErrors');
+const ErrorHandler = require('../utils/errorHandler');
 const sendToken = require('../utils/generateToken');
 const sendEmail = require('../utils/sendEmail');
 const crypto = require('crypto');
 
-// Register a new user along with their farm details : /api/v1/register
-const registerUser =  catchAsyncErrors(async (req, res, next) => {
+// Register user
+const registerUser = catchAsyncErrors(async (req, res, next) => {
   const { name, email, password, phone } = req.body;
-
-  // Check if all required fields are provided
   if (!name || !email || !password || !phone) {
     return next(new ErrorHandler('Please fill in all the required fields', 400));
   }
 
-  // Create user and farm documents within the same session
-  const user = await User.create({ name, email, password, phone });
-  // const farm = await Farm.create({ user: user._id, location, farmSize });
+  // Check if user already exists
+  const existingUser = await User.findByEmail(email);
+  if (existingUser) {
+    return next(new ErrorHandler('User already exists with this email', 400));
+  }
 
-  // Associate farm with the user and save changes
-  // await farm.save();
-  await user.save();
-
-  // Send response with reqistered user and farm details
+  const userId = await User.create({ name, email, password, phone });
   res.status(201).json({
     success: true,
-    message: 'User was successfuly registered'
-  }) ;
+    message: 'User registered successfully',
+    userId
+  });
 });
 
-// Login a registered user : : /api/v1/login
+// Login user
 const userLogin = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
-
-  // Check if all required fields are provided
-  if ( !email || !password ) {
-    return res.status(400).json({ message: 'Please enter both email and password' });
-  }
-
-  // Find the related user from the database
-  const user = await User.findOne({email}).select('+password');
-
-  // Check is the provided email exists
-  if (!user) {
-    return res.status(401).json({ message: 'Invalid email or password' });
-  }
-
-  // Check if the provided password corresponds with password in database
-  const isPasswordCorrect = await user.comparePassword(password);
-
-  // Check is the password entered is correct
-  if (!isPasswordCorrect) {
-    return res.status(401).json({ message: 'Invalid email or password' });
-  }
   
-  // Create a json web token
+  if (!email || !password) {
+    return next(new ErrorHandler('Please enter email and password', 400));
+  }
+
+  const user = await User.findByEmail(email);
+  if (!user) {
+    return next(new ErrorHandler('Invalid email or password', 401));
+  }
+
+  const isMatch = await User.comparePassword(password, user.password);
+  if (!isMatch) {
+    return next(new ErrorHandler('Invalid email or password', 401));
+  }
+
   sendToken(user, 200, res);
+});
 
-})
-
-// Forgot Password : /api/v1/forgot/password
+// Forgot Password
 const forgotPassword = catchAsyncErrors(async (req, res, next) => {
-  // Find the related user from the database
-  const user = await User.findOne({email: req.body.email});
-
-  // Check is the provided email exists
+  const user = await User.findByEmail(req.body.email);
   if (!user) {
     return next(new ErrorHandler('No user found with this email', 404));
   }
 
-  // Get password reset token
-  const resetToken = user.getResetPasswordToken();
+  const resetToken = await User.setResetPasswordToken(user.id);
+  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/password/reset/${resetToken}`;
 
-  await user.save({ validateBeforeSave : false });
-
-  // Create reset password url
-  const resetUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`
-
-  const message = `Use the link below to reset your password:\n\n${resetUrl}\n\n Ignore this email if you did not request password reset.`
-  
   try {
     await sendEmail({
-      email : user.email,
-      subject : 'Farm_Link Password recovery',
-      message
+      email: user.email,
+      subject: 'LEDPlug Password Recovery',
+      message: `Use the link below to reset your password:\n\n${resetUrl}\n\nThis link will expire in 30 minutes.`
     });
-  
-    res.status(200).json({
-      success : true,
-      message: `Email sent successfully to: ${user.email}`
-    });
-  } catch (error) {
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
 
-    await user.save({ validateBeforeSave : false });
-    return next(new ErrorHandler('Email not sent'), 500);
+    res.status(200).json({ 
+      success: true, 
+      message: `Email sent to ${user.email}` 
+    });
+  } catch (err) {
+    // Reset the token if email fails
+    let connection;
+    try {
+      connection = await oracledb.getConnection();
+      await connection.execute(
+        `UPDATE users SET reset_password_token = NULL, reset_password_expire = NULL WHERE id = :id`,
+        { id: user.id }
+      );
+      await connection.commit();
+    } catch (dbErr) {
+      console.error('Error resetting token:', dbErr);
+    } finally {
+      if (connection) await connection.close();
+    }
+
+    return next(new ErrorHandler('Email could not be sent', 500));
   }
-  
-})
+});
 
-// Password reset: /api/v1/password/reset/:token
+// Password Reset
 const passwordReset = catchAsyncErrors(async (req, res, next) => {
-  // Hash the token from the url
-  const resetPasswordToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+  const resetToken = req.params.token;
+  const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-  const user = await User.findOne({resetPasswordToken, resetPasswordExpire: {$gt : Date.now()}});
+  let connection;
+  try {
+    connection = await oracledb.getConnection();
+    const result = await connection.execute(
+      `SELECT * FROM users WHERE reset_password_token = :token AND reset_password_expire > CURRENT_TIMESTAMP`,
+      { token: hashedToken },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
 
-  // Check is the provided email exists
-  if (!user) {
-    return next(new ErrorHandler('Password reset token is invalid or expired', 400));
+    if (!result.rows || result.rows.length === 0) {
+      return next(new ErrorHandler('Password reset token is invalid or expired', 400));
+    }
+
+    const user = result.rows[0];
+
+    if (!req.body.password) {
+      return next(new ErrorHandler('Please provide a new password', 400));
+    }
+
+    const newHashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    await connection.execute(
+      `UPDATE users SET password = :password, reset_password_token = NULL, reset_password_expire = NULL WHERE id = :id`,
+      { password: newHashedPassword, id: user.ID }
+    );
+
+    await connection.commit();
+    
+    sendToken(user, 200, res);
+  } catch (error) {
+    if (connection) await connection.rollback();
+    return next(new ErrorHandler('Password reset failed', 500));
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
   }
+});
 
-  // Create new password
-  user.password = req.body.password;
-  user.confirmPassword = req.body.confirmPassword;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpire = undefined;
-  
-  await user.save();
-
-  sendToken(user, 200, res);
-})
-
-// Logout user: /api/v1/logout
-const userLogout = catchAsyncErrors(async (req, res, next) => {
+// Logout user
+const userLogout = catchAsyncErrors(async (req, res) => {
   res.cookie('token', 'none', {
     expires: new Date(Date.now()),
-    httpOnly : true
-  })
+    httpOnly: true
+  });
 
   res.status(200).json({
     success: true,
-    message : 'Logged out successfully'
-  })
+    message: 'Logged out successfully'
+  });
 });
 
-module.exports = {
-  registerUser,
-  userLogin,
-  forgotPassword,
-  passwordReset,
-  userLogout
-};
+module.exports = { registerUser, userLogin, forgotPassword, passwordReset, userLogout };

@@ -7,7 +7,7 @@ const navigate = useNavigate();
   return (
     <div className="header-container">
       <div className="logo-container">
-        <h1>FarmLink</h1>
+        <h1>LEDPlug</h1>
       </div>
       <div className="wrapper">
         <div className="nav">

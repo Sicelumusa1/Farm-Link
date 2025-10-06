@@ -56,7 +56,7 @@ export default function Login() {
         <div className="image-container">
           <div className="login-spacer"></div>
           <div className="title_slogan-container">
-            <h1 className="FarmLink-title">FarmLink</h1>
+            <h1 className="FarmLink-title">LEDPlug</h1>
             <p className="Farmlink-slogans">Link the future of farming with us</p>
             <button className="back-btn" onClick={() => navigate("/")}>Back</button>
           </div>

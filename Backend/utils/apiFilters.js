@@ -1,62 +1,62 @@
 class FarmLinkFilters {
-  constructor(query, queryString) {
-    this.query = query;
+  constructor(baseQuery, queryString) {
+    this.baseQuery = baseQuery;
     this.queryString = queryString;
   }
 
   filter() {
-    const queryCopy = {...this.queryString};
-  
-    // Remove fields from the query
-    const removeFields = ['fields', 'sort', 'search', 'limit', 'page'];
-    removeFields.forEach(el => delete queryCopy[el]);
-  
-    let queryStr = JSON.stringify(queryCopy);
-    
-    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-  
-    this.query = this.query.find(JSON.parse(queryStr));
+    const queryObj = { ...this.queryString };
+    const excludedFields = ['page', 'sort', 'limit', 'fields', 'search'];
+    excludedFields.forEach(el => delete queryObj[el]);
+
+    // Convert to Oracle WHERE clause format
+    if (Object.keys(queryObj).length > 0) {
+      const whereConditions = Object.keys(queryObj)
+        .map(key => `${key} = :${key}`)
+        .join(' AND ');
+      this.baseQuery += ` WHERE ${whereConditions}`;
+    }
+
     return this;
   }
 
-  limitFields() {
-    if (this.queryString.fields) {
-      const fields = this.queryString.fields.split(',').join(' ');
-      this.query = this.query.select(fields);
-    } else {
-      this.query = this.query.select("-__v");
+  searchByQuery() {
+    if (this.queryString.search) {
+      const searchCondition = `name LIKE '%${this.queryString.search}%' OR email LIKE '%${this.queryString.search}%'`;
+      if (this.baseQuery.includes('WHERE')) {
+        this.baseQuery += ` AND (${searchCondition})`;
+      } else {
+        this.baseQuery += ` WHERE (${searchCondition})`;
+      }
     }
     return this;
   }
 
   sort() {
-    if(this.queryString.sort) {
-      const sortBy = this.queryString.sort.split(',').join(' ');
-      this.query = this.query.sort(sortBy);
+    if (this.queryString.sort) {
+      this.baseQuery += ` ORDER BY ${this.queryString.sort.replace(',', ' ')}`;
     } else {
-      this.query = this.query.sort('name');
+      this.baseQuery += ' ORDER BY created_at DESC';
     }
     return this;
   }
 
-  searchByQuery() {
-    if(this.queryString.search) {
-      const searchTerm = this.queryString.search.split('-').join(' ');
-      this.query = this.query.find({$text: {$search: "\""+ searchTerm +"\""}});
+  limitFields() {
+    if (this.queryString.fields) {
+      const fields = this.queryString.fields.split(',').join(', ');
+      this.baseQuery = this.baseQuery.replace('*', fields);
     }
-
     return this;
   }
 
   pagination() {
-    const page = parseInt(this.queryString.page, 10) || 1;
-    const limit = parseInt(this.queryString.limit, 10) || 10;
-    const skipres = (page - 1) * limit;
-    
-    this.query = this.query.skip(skipres).limit(limit);
+    const page = this.queryString.page * 1 || 1;
+    const limit = this.queryString.limit * 1 || 100;
+    const offset = (page - 1) * limit;
 
+    this.baseQuery += ` OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY`;
     return this;
   }
-
 }
+
 module.exports = FarmLinkFilters;

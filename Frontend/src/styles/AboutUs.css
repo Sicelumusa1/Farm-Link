@@ -1,0 +1,269 @@
+.about-container {
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8f5e8 100%);
+  text-align: center;
+  overflow: hidden;
+}
+
+.about-header {
+  max-width: 800px;
+  margin: 0 auto 60px;
+}
+
+.about-title {
+  font-size: 3rem;
+  color: #2e7d32;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.about-subtitle {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.learn-more-btn {
+  background: #0575e6;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.learn-more-btn:hover {
+  background-color: #ffffff;
+  border: solid 1px #0575e6;
+  color: #0575e6;
+  transform: translateY(-2px);
+}
+
+.about-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto 60px;
+}
+
+.feature {
+  background: white;
+  padding: 30px 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.feature:hover {
+  transform: translateY(-5px);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  color: #2e7d32;
+  margin-bottom: 20px;
+}
+
+.feature h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.feature p {
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Municipalities Carousel Styles */
+.municipalities-section {
+  margin: 80px auto;
+  max-width: 1200px;
+}
+
+.municipalities-title {
+  font-size: 2.2rem;
+  color: #2e7d32;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.municipalities-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.carousel-container {
+  overflow: hidden;
+  position: relative;
+  padding: 20px 0;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 20px;
+  animation: scroll 30s linear infinite;
+  width: max-content;
+}
+
+.carousel-container:hover .carousel-track {
+  animation-play-state: paused;
+}
+
+.municipality-card {
+  background: white;
+  padding: 20px 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-width: 150px;
+  text-align: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.municipality-card.active {
+  border: 2px solid #2e7d32;
+  background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+}
+
+.municipality-card.inactive {
+  border: 2px solid #e0e0e0;
+  background: #fafafa;
+  opacity: 0.7;
+}
+
+.municipality-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.municipality-card.active:hover {
+  box-shadow: 0 8px 20px rgba(46, 125, 50, 0.2);
+}
+
+.municipality-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  opacity: 0.8;
+}
+
+.municipality-card.active .municipality-icon {
+  opacity: 1;
+}
+
+.municipality-card h4 {
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.municipality-card.active h4 {
+  color: #2e7d32;
+}
+
+.municipality-card.inactive h4 {
+  color: #999;
+}
+
+.municipality-card p {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.municipality-card.active p {
+  color: #666;
+}
+
+.municipality-card.inactive p {
+  color: #bbb;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-150px * 6 - 20px * 5));
+  }
+}
+
+.about-stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  max-width: 800px;
+  margin: 80px auto 0;
+}
+
+.stat h3 {
+  font-size: 2.5rem;
+  color: #2e7d32;
+  margin-bottom: 10px;
+}
+
+.stat p {
+  color: #666;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .about-title {
+    font-size: 2.5rem;
+  }
+  
+  .about-features {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .municipalities-title {
+    font-size: 1.8rem;
+  }
+  
+  .municipality-card {
+    min-width: 130px;
+    padding: 15px 10px;
+  }
+  
+  .carousel-track {
+    gap: 15px;
+  }
+  
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-130px * 6 - 15px * 5));
+    }
+  }
+  
+  .about-stats {
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-container {
+    padding: 60px 15px;
+  }
+  
+  .municipality-card {
+    min-width: 120px;
+    padding: 12px 8px;
+  }
+  
+  .municipality-card h4 {
+    font-size: 1rem;
+  }
+  
+  .municipality-card p {
+    font-size: 0.8rem;
+  }
+}

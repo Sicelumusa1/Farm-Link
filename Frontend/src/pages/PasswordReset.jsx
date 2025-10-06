@@ -23,7 +23,7 @@ export default function PasswordReset() {
   }
   return (
     <div className="passwordReset">
-      <h1 className="logo-reset-password">FarmLink</h1>
+      <h1 className="logo-reset-password">LEDPlug</h1>
       <form className="password-reset-container" onSubmit={handleSubmit}>
         <h1 className="create-password-title">Create New Password</h1>
         <input type="password" className="reset-password-input-container" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter Password" required />

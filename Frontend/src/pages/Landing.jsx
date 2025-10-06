@@ -4,8 +4,11 @@ import Hero from '../components/Hero'
 import MidBit from '../components/MidBit'
 import Services from '../components/Services'
 import Team from '../components/Team'
+import led from '../assets/images/Farmlink_imgs/LED_Plug.svg'
 import '../styles/HeaderSignOut.css'
 import { useNavigate } from 'react-router-dom'
+import PrivateServices from '../components/PrivateServices'
+import About from '../components/About'
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -13,7 +16,8 @@ export default function Landing() {
     <>
       <div className="header-container">
         <div className="logo-container">
-          <h1>FarmLink</h1>
+          <img src={led} alt="LEDPlug Logo" className="logo" />
+          <h3 className="logo-text">LEDPlug</h3>
         </div>
         <div className="wrapper">
           <div className="nav">
@@ -37,7 +41,8 @@ export default function Landing() {
       {<Hero />}
       {<Services />}
       {<MidBit />}
-      {<Team />}
+      {/* <PrivateServices /> */}
+      {<About />}
       {<Footer />}
     </>
   )

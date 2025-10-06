@@ -6,7 +6,7 @@ export default function Footer() {
     <div className="footer-container">
         <div className="footer-wrapper">
             <div className="footer-title-container">
-                <h1>Farm Link</h1>
+                <h1>LED Plug</h1>
                 <p>Link the future of farming with us.</p>
                 <div className="socials">
                 </div>

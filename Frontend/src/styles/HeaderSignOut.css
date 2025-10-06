@@ -9,11 +9,26 @@
 
 .logo-container {
     margin-left: 80px;
+    position: relative;
+    display: inline-block;
 }
 
-.logo-container h1 {
-    font-size: 39px;
-    color: #283712;
+.logo {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.logo-text {
+  position: absolute;
+  top: 80%;   
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #2d7d46;
+  font-size: 1.2rem;
+  font-weight: bold;
+  pointer-events: none;
 }
 
 .wrapper {

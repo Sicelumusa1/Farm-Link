@@ -6,18 +6,23 @@ const app = express()
 const dotenv = require('dotenv');
 const errorMiddleware = require('./middleware/errors');
 const ErrorHandler = require('./utils/errorHandler');
-const connectDB = require('./config/db');
+const { initPool } = require('./config/db');
 
 
 // Setting up .env file variables
 dotenv.config();
 
-// Connect to database
-connectDB();
+// Initialize Oracle DB connection pool at server startup
+initPool()
+  .then(() => console.log('Oracle DB pool initialized'))
+  .catch(err => {
+    console.error('Failed to initialize Oracle DB pool:', err);
+    process.exit(1); // Exit if pool fails
+  });
 
 // Permited frontend url
 const corsOptions = {
-  origin: 'https://farml.netlify.app',
+  origin: 'http://localhost:5173',
   optionsSuccessStatus: 200,
   credentials: true
 }

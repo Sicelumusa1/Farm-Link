@@ -1,6 +1,7 @@
 import React from 'react'
 import '../styles/Hero.css'
 import { useNavigate } from 'react-router-dom'
+import HeaderCarousel from './Carousel';
 
 export default function Hero() {
 
@@ -8,6 +9,7 @@ export default function Hero() {
 
   return (
     <div className="hero-container">
+        <HeaderCarousel />
         <div className="hero-wrapper">
             <div className="title-container">
                 <h1 className="title">Empowering... Revolutionizing Agriculture</h1>
@@ -17,7 +19,7 @@ export default function Hero() {
             </div>
             <div className="hero-btn-container">
                 <button className="get_started-btn" onClick={() => navigate("/register")}>Get started</button>
-                <button className="learn_more-btn" onClick={() => navigate("/login")}>Learn More</button>
+                <button className="learn_more-btn" onClick={() => navigate("/about")}>Learn More</button>
             </div>
         </div>
     </div>

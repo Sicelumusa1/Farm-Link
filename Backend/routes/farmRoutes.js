@@ -1,4 +1,4 @@
-// Map URL endpoints to controller functions.
+
 const express = require('express');
 const router = express.Router();
 const { cookieJwtAuth } = require('../middleware/crackCookie');
@@ -8,6 +8,9 @@ const { createFarm, updateFarm, getUserFarmAndCrops } = require('../controllers/
 
 router.use(cookieJwtAuth);
 
-router.route('/profile/farm').post(createFarm).put(updateFarm).get(getUserFarmAndCrops);
+router.route('/profile/farm')
+    .post(createFarm)
+    .put(updateFarm)
+    .get(getUserFarmAndCrops);
 
 module.exports = router;

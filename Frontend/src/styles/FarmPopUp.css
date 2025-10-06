@@ -94,3 +94,59 @@
     cursor: pointer;
     background-color: #005ab5;
 }
+
+/* error styles */
+.input-group {
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.field-error {
+  color: #ff4444;
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+.input-group input.error {
+  border-color: #ff4444;
+  box-shadow: 0 0 5px rgba(255, 68, 68, 0.3);
+}
+
+.location-error {
+  background-color: #ffebee;
+  border: 1px solid #ff4444;
+  color: #ff4444;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+}
+
+.coordinates-display {
+  background-color: #e8f5e8;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0;
+  font-family: monospace;
+}
+
+.get-location-btn {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.get-location-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.get-location-btn:hover:not(:disabled) {
+  background-color: #1976d2;
+}

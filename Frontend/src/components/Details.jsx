@@ -1,181 +1,281 @@
 import { useContext, useEffect, useState } from 'react'
-import { profile } from '../services/ProfileService';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCirclePlus, faLocationCrosshairs } from '@fortawesome/free-solid-svg-icons'
 import '../styles/Details.css'
 import { allFarmerDatails, updateFarmerDatails } from '../services/farmerService';
 import { ThemeContext } from '../contexts/ThemeContext';
+import { GetCurrentLocationContext } from '../contexts/CurrentLocationContext';
 
-export default function Details({handleGetLocation, coordinates, setReRender}) {
-  const [user, setUser] = useState();
-  const [farm, setFarm] = useState();
-  const [id, setId] = useState();
-  const [name, setName] = useState();
-  const [email, setEmail] = useState();
-  const [phone, setPhone] = useState();
-  const [location, setLocation] = useState();
-  const [streetName, setStreetName] = useState();
-  const [houseNumber, setHouseNumber] = useState();
-  const [city, setCity] = useState();
-  const [farmSize, setFarmSize] = useState();
-  const [coordinatesDb, setCoordinatesDb] = useState([]);
-  const [selected, setSelected] = useState();
-  const [updated,setUpdated] = useState(false);
+export default function Details() {
+  const [farm, setFarm] = useState(null);
+  const [editingField, setEditingField] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    municipality: '',
+    ward: '',
+    city: '',
+    farm_size: '',
+    latitude: '',
+    longitude: ''
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const { theme } = useContext(ThemeContext);
+  const { coordinates, handleGetLocation } = useContext(GetCurrentLocationContext);
 
   useEffect(() => {
-    //fetches the information of the current user
-    const fetchData = async () => {
-      try {
-        const data = await profile();
-        setUser(data.data);
-        if (data.data._id) {
-          setId(data.data._id)
-          setName(data.data.name)
-          setEmail(data.data.email)
-          setPhone(data.data.phone)
-        }
-      } catch(err) {
-        console.log(err);
-      }
-    } 
-    fetchData();
-  }, [])
+    fetchFarmDetails();
+  }, []);
 
-  useEffect(() => {
-    //fetches all the information of the farmer
-    const fetchData = async () => {
-      try {
-        const data = await allFarmerDatails();
-        setFarm(data.data);
-        setLocation(data.data.location)
-        setStreetName(data.data.streetName)
-        setHouseNumber(data.data.houseNumber)
-        setCity(data.data.city)
-        setFarmSize(data.data.farmSize)
-        setCoordinatesDb(data.data.coordinates)
-      } catch(err) {
-        console.log(err);
+  const fetchFarmDetails = async () => {
+    try {
+      setIsLoading(true);
+      const response = await allFarmerDatails();
+      if (response.success && response.data) {
+        setFarm(response.data);
+        // Initialize form data with current farm values
+        setFormData({
+          name: response.data.NAME || '',
+          municipality: response.data.MUNICIPALITY || '',
+          ward: response.data.WARD || '',
+          city: response.data.CITY || '',
+          farm_size: response.data.FARM_SIZE || '',
+          latitude: response.data.LATITUDE || '',
+          longitude: response.data.LONGITUDE || ''
+        });
       }
-    } 
-    fetchData();
-  }, [updated])
-
-
-  const handleUpdate = async () => {
-    //updates the current users information
-    if (selected) {
-      try {
-        const data = await updateFarmerDatails({name, location, streetName, houseNumber, city, farmSize, coordinates});
-        setUpdated(true)
-        setReRender(prev => !prev); //sets state to re-render component;
-      } catch(err) {
-        console.log(err);
-      }
+    } catch (error) {
+      console.error('Error fetching farm details:', error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleEditField = (fieldName) => {
+    setEditingField(fieldName);
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSaveField = async (fieldName) => {
+    if (!farm) return;
+
+    try {
+      setIsUpdating(true);
+      
+      // Prepare update data - only send the field being updated
+      const updateData = {
+        [fieldName]: formData[fieldName]
+      };
+
+      // For coordinates, we need to send both latitude and longitude
+      if (fieldName === 'latitude' || fieldName === 'longitude') {
+        updateData.latitude = formData.latitude;
+        updateData.longitude = formData.longitude;
+      }
+
+      await updateFarmerDatails(updateData);
+      
+      // Refresh farm data
+      await fetchFarmDetails();
+      setEditingField(null);
+      
+    } catch (error) {
+      console.error('Error updating farm details:', error);
+      alert(error.message || 'Failed to update farm details');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleUpdateCoordinates = async () => {
+    if (!coordinates.latitude || !coordinates.longitude) {
+      alert('Please get your current location first');
+      return;
+    }
+
+    try {
+      setIsUpdating(true);
+      await updateFarmerDatails({
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude
+      });
+      
+      // Refresh farm data
+      await fetchFarmDetails();
+      alert('Coordinates updated successfully!');
+      
+    } catch (error) {
+      console.error('Error updating coordinates:', error);
+      alert(error.message || 'Failed to update coordinates');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleGetCurrentLocation = async () => {
+    try {
+      await handleGetLocation();
+    } catch (error) {
+      console.error('Error getting location:', error);
+      alert('Failed to get current location. Please ensure location permissions are enabled.');
+    }
+  };
+
+  const renderEditableField = (fieldName, label, value, type = 'text') => {
+    const isEditing = editingField === fieldName;
+    
+    return (
+      <div className={`details-field-container ${theme}`} onClick={() => !isEditing && handleEditField(fieldName)}>
+        <p className={`details-field-title details-title ${theme}`}>{label}</p>
+        <div className="details-field-input">
+          {isEditing ? (
+            <div className="details-edit-container">
+              <input 
+                type={type}
+                value={formData[fieldName]}
+                onChange={(e) => handleInputChange(fieldName, e.target.value)}
+                className="details-input-container"
+                autoFocus
+                onBlur={() => handleSaveField(fieldName)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSaveField(fieldName);
+                  }
+                }}
+                disabled={isUpdating}
+              />
+              {isUpdating && <div className="loading-spinner">Updating...</div>}
+            </div>
+          ) : (
+            <div className={`details-value-container ${theme}`}>
+              <p className={`details-value ${theme}`}>{value || 'Not set'}</p>
+              <span className="edit-hint">Click to edit</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className={`details-container ${theme}`}>
+        <div className="loading">Loading farm details...</div>
+      </div>
+    );
   }
 
-  const handleUpdateCurrentCoords = () => {
-    handleGetLocation();
-    if (coordinates) {
-      setSelected('coordinates')
-      handleUpdate();
-    }
+  if (!farm) {
+    return (
+      <div className={`details-container ${theme}`}>
+        <div className="no-farm-message">
+          <p>No farm details found. Please set up your farm first.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className={`details-container ${theme}`}>
       <div className={`details-wrapper ${theme}`}>
+        <div className="details-header">
+          <h2 className={`details-main-title ${theme}`}>Farm Details</h2>
+          <p className="details-subtitle">Click on any field to edit</p>
+        </div>
+        
         <div className={`details-selectors ${theme}`}>
-          <div className="details-farmer-container">
-            <p className={`details-farmer-title details-title  ${theme}`}>Name</p>
-            <div className="details-farmer-input">
-              <div className={`details-name-container ${theme}`}>
-                <p className={`details-name ${theme} details-title ${theme}`}>{user && user.name}</p>
+          {/* Farm Details */}
+          {renderEditableField('name', 'Farm Name', farm.NAME)}
+          {renderEditableField('municipality', 'Municipality', farm.MUNICIPALITY)}
+          {renderEditableField('ward', 'Ward', farm.WARD)}
+          {renderEditableField('city', 'City', farm.CITY)}
+          {renderEditableField('farm_size', 'Farm Size (Ha)', farm.FARM_SIZE, 'number')}
+          
+          {/* Coordinates Section */}
+          <div className="details-coordinates-section">
+            <div className="coordinates-header">
+              <p className={`details-title ${theme}`}>Coordinates</p>
+              <button 
+                className="get-location-btn"
+                onClick={handleGetCurrentLocation}
+                disabled={isUpdating}
+              >
+                <FontAwesomeIcon icon={faLocationCrosshairs} />
+                Get Current Location
+              </button>
+            </div>
+            
+            <div className="coordinates-fields">
+              <div className="coordinate-field">
+                <span className="coordinate-label">Latitude:</span>
+                {editingField === 'coordinates' ? (
+                  <input 
+                    type="text"
+                    value={formData.latitude}
+                    onChange={(e) => handleInputChange('latitude', e.target.value)}
+                    className="details-input-container coordinate-input"
+                    onBlur={() => handleSaveField('latitude')}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSaveField('latitude')}
+                  />
+                ) : (
+                  <span 
+                    className={`coordinate-value ${theme}`}
+                    onClick={() => handleEditField('coordinates')}
+                  >
+                    {farm.LATITUDE || 'Not set'}
+                  </span>
+                )}
+              </div>
+              
+              <div className="coordinate-field">
+                <span className="coordinate-label">Longitude:</span>
+                {editingField === 'coordinates' ? (
+                  <input 
+                    type="text"
+                    value={formData.longitude}
+                    onChange={(e) => handleInputChange('longitude', e.target.value)}
+                    className="details-input-container coordinate-input"
+                    onBlur={() => handleSaveField('longitude')}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSaveField('longitude')}
+                  />
+                ) : (
+                  <span 
+                    className={`coordinate-value ${theme}`}
+                    onClick={() => handleEditField('coordinates')}
+                  >
+                    {farm.LONGITUDE || 'Not set'}
+                  </span>
+                )}
               </div>
             </div>
-          </div>
-          <div className="details-email-container">
-            <p className={`details-email-title details-title ${theme}`}>Email</p>
-            <div className="details-email-input">
-              <div className={`details-email2-container ${theme}`}>
-                <p className={`details-email ${theme} details-title ${theme}`}>{user && user.email}</p>
+            
+            {coordinates.latitude && coordinates.longitude && (
+              <div className="current-coordinates">
+                <p>Current location: {coordinates.latitude.toFixed(6)}, {coordinates.longitude.toFixed(6)}</p>
+                <button 
+                  className="update-coords-btn"
+                  onClick={handleUpdateCoordinates}
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? 'Updating...' : 'Update with Current Location'}
+                </button>
               </div>
-            </div>
-          </div>
-          <div className="details-phone-container">
-            <p className={`details-phone-title details-title ${theme}`}>Phone</p>
-            <div className="details-phone-btn">
-              <p className={`details-phone ${theme}`} >{user && user.phone}</p>
-            </div>
-          </div>
-          <div className="details-location-container" onClick={() => setSelected('location')}>
-            <p className={`details-location-title details-title ${theme}`}>Location</p>
-            {!farm || selected == 'location'? <div className="details-location-btn">
-              <input type="text" placeholder="" className="details-input-container" required onChange={(e) => setLocation(e.target.value)} />
-            </div>:
-            <div className={`details-location2-container ${theme}`}>
-              <p className={`details-location ${theme} details-title ${theme}`}>{farm && farm.location}</p>
-            </div>}
-          </div>
-          <div className="details-street-container" onClick={() => setSelected('street')}>
-            <p className={`details-street-title details-title ${theme}`}>Street</p>
-            {!farm || selected == 'street' ? <div className="details-street-btn">
-              <input type="text" placeholder="" className="details-input-container" required onChange={(e) => setStreetName(e.target.value)}/>
-            </div>: 
-            <div className={`details-street2-container ${theme}`}>
-              <p className={`details-street ${theme} details-title ${theme}`}>{farm && farm.streetName}</p>
-            </div>}
-          </div>
-          <div className="details-house-container" onClick={() => setSelected('house')}>
-            <p className={`details-house-title details-title ${theme}`}>Property Number</p>
-            {!farm || selected == 'house' ?<div className="details-house-btn">
-              <input type="number" placeholder="" className="details-input-container" required onChange={(e) => setHouseNumber(e.target.value)} />
-            </div>:
-            <div className={`details-house2-container ${theme}`}>
-              <p className={`details-house ${theme} details-title ${theme}`}>{farm && farm.houseNumber}</p>
-            </div>}
-          </div>
-          <div className="details-city-container" onClick={() => setSelected('city')}>
-            <p className={`details-city-title details-title ${theme}`}>City</p>
-            {!farm || selected == 'city' ?<div className="details-city-btn">
-              <input type="text" placeholder="" className="details-input-container" required onChange={(e) => setCity(e.target.value)}/>
-            </div>:
-            <div className={`details-city2-container ${theme}`}>
-              <p className={`details-city ${theme} details-title ${theme}`}>{farm && farm.city}</p>
-            </div>}
-          </div>
-          <div className=" details-plot-container" onClick={() => setSelected('plot')}>
-            <p className={`details-title ${theme}`}>Plot Size</p>
-            {!farm || selected == 'plot' ?<div className="details-plot-btn">
-              <input type="number" placeholder="" className="details-input-container" required onChange={(e) => setFarmSize(e.target.value)}/>
-            </div>:
-            <div className="details-plot2-container">
-              <p className={`details-plot ${theme} details-title ${theme}`}>{farm && farm.farmSize}</p>
-            </div>}
-          </div>
-          <div className=" details-coordinates-container">
-            <p className={`details-title ${theme}`}>Coordinates</p>
-            {farm && <div className="details-coordinates2-btn">
-              <p className={`details-value ${theme}`}>{farm && farm.coordinates && farm.coordinates.latitude}
-              <span>, </span>
-              {farm && farm.coordinates && farm.coordinates.longitude}</p>
-            </div>}
+            )}
           </div>
         </div>
-        <div className="update-details-btn-wrapper">
-          <div className={`update-details-container ${theme}`} onClick={handleUpdate}>
-            <FontAwesomeIcon icon={faCirclePlus} className="update-detailsIcon" />
-            <p>Update</p>
-          </div>
-          <div className={`update-coords-details-container ${theme}`}>
-            <FontAwesomeIcon 
-              icon={faLocationCrosshairs}
-              className="update-coordes-detailsIcon"
-              onClick={handleUpdateCurrentCoords}/>
+
+        <div className="details-actions">
+          <div className="last-updated">
+            <p>Last updated: {new Date().toLocaleDateString()}</p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

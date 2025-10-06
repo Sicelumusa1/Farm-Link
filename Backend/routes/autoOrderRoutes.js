@@ -1,11 +1,16 @@
 const express = require('express');
-const { createAutoOrder } = require('../controllers/autoOrderController');
+const {
+  createAutoOrder,
+  getCropAvailabilityReport,
+  getCropAvailabilityDetails
+} = require('../controllers/autoOrderController');
 const {cookieJwtAuth, authorizedRoles } = require('../middleware/crackCookie');
+
 const router = express.Router();
 
-router.use(cookieJwtAuth);
-
-// Admin only routes
-router.route('/orders/auto').post(authorizedRoles('admin'), createAutoOrder);
+// Admin routes for auto ordering
+router.post('/auto-orders', cookieJwtAuth, authorizedRoles, createAutoOrder);
+router.get('/crops/availability-report', cookieJwtAuth, authorizedRoles, getCropAvailabilityReport);
+router.get('/crops/:cropName/availability-details', cookieJwtAuth, authorizedRoles, getCropAvailabilityDetails);
 
 module.exports = router;

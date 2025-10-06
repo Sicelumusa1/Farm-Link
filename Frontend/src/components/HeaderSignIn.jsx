@@ -51,7 +51,7 @@ export default function HeaderSignIn() {
   return (
     <div className={`header_signin-container ${theme}`}>
       <div className={`logo_signin-container ${theme}`}>
-        <h1 className={`logo_signin-title-container ${theme}`}>FarmLink</h1>
+        <h1 className={`logo_signin-title-container ${theme}`}>LEDPlug</h1>
       </div>
       <div className="header-nav">
         

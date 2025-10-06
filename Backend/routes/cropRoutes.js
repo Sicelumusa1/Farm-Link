@@ -1,15 +1,26 @@
-// Map URL endpoints to controller functions
 const express = require('express');
-const router = express.Router();
-const { cookieJwtAuth } = require('../middleware/crackCookie');
+const {
+  createCrop,
+  getUserCrops,
+  getCrop,
+  updateCrop,
+  deleteCrop,
+  updateCropGrowthStage,
+  getAllCrops,
+  uploadCropImage
+} = require('../controllers/cropController');
 const upload = require('../middleware/uploadMiddleware');
-// // Import crop controller methods
-const { addCrop, updateCrop, getCrops } = require('../controllers/cropController');
+const {cookieJwtAuth, authorizedRoles } = require('../middleware/crackCookie');
 
-router.use(cookieJwtAuth);
+const router = express.Router();
 
-router.route('/profile/farm/crops').post(addCrop);
-router.route('/profile/farm/crops').get(getCrops);
-router.route('/profile/farm/crops/:cropId').put(updateCrop);
+router.post('/crops', cookieJwtAuth, createCrop);
+router.get('/crops', cookieJwtAuth, getUserCrops);
+router.get('/crops/all', cookieJwtAuth, authorizedRoles, getAllCrops); // Admin only
+router.get('/crops/:id', cookieJwtAuth, getCrop);
+router.put('/crops/:id', cookieJwtAuth, updateCrop);
+router.delete('/crops/:id', cookieJwtAuth, deleteCrop);
+router.patch('/crops/:id/growth-stage', cookieJwtAuth, updateCropGrowthStage);
+router.post('/crops/:id/image', cookieJwtAuth, upload.single('image'), uploadCropImage);
 
 module.exports = router;

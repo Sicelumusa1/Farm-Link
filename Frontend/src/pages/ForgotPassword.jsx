@@ -21,7 +21,7 @@ export default function ForgotPassword() {
   }
   return (
     <div className="forgotPassword">
-      <h1 className="logo-forget-password">FarmLink</h1>
+      <h1 className="logo-forget-password">LEDPlug</h1>
       <form className="forgot-password-email-container" onSubmit={handleSubmit}>
         <h1 className="forgot-password-title">Forgot Password</h1>
         <input type="email" className="email-input-container"  placeholder="Enter Email Address" value={email} onChange={(e) => setEmail(e.target.value)} required />

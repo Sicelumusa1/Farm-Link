@@ -1,15 +1,28 @@
-// Maps URL endpoints to controller functions.
 const express = require('express');
-const router = express.Router();
+const {
+  createDelivery,
+  getDelivery,
+  getDeliveries,
+  getAllDeliveries,
+  getDeliveriesByCrop,
+  updateDelivery,
+  deleteDelivery
+} = require('../controllers/deliveryController');
 const {cookieJwtAuth, authorizedRoles } = require('../middleware/crackCookie');
 
-// Importing delivery controller methods
-const { createDelivery, getDelivery, getDeliveries, updateDelivery, deleteDelivery } = require('../controllers/deliveryController');
+const router = express.Router();
 
-router.route('/delivery').post(cookieJwtAuth, createDelivery);
-router.route('/deliveries').get(cookieJwtAuth, getDeliveries);
-router.route('/delivery/:id').get(cookieJwtAuth, getDelivery);
-router.route('/delivery/:id').put(cookieJwtAuth, updateDelivery);
-router.route('/delivery/:id').delete(cookieJwtAuth, deleteDelivery);
+// User routes
+router.post('/deliveries', cookieJwtAuth, createDelivery);
+router.get('/deliveries', cookieJwtAuth, getDeliveries);
+router.get('/deliveries/:id', cookieJwtAuth, getDelivery);
+router.put('/deliveries/:id', cookieJwtAuth, updateDelivery);
+router.delete('/deliveries/:id', cookieJwtAuth, deleteDelivery);
+
+// Admin routes
+router.get('/admin/deliveries', cookieJwtAuth, authorizedRoles, getAllDeliveries);
+
+// Crop-related deliveries
+router.get('/crops/:cropId/deliveries', cookieJwtAuth, getDeliveriesByCrop);
 
 module.exports = router;

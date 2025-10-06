@@ -5,7 +5,7 @@ export default function RecoveryEmail() {
     const navigate = useNavigate();
   return (
     <div className="recovery-email-container">
-      <h1 className="logo-recovery-email">FarmLink</h1>
+      <h1 className="logo-recovery-email">LEDPlug</h1>
       <div className="recovery-email-sent-container">
         <div className="sent-email-mes-containter">
             <h1 className="recovery-email-title">Reset your password</h1>

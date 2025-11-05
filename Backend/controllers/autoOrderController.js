@@ -4,13 +4,14 @@ const User = require('../models/userModel');
 const Farm = require('../models/farmModel');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middleware/catchAsyncErrors');
+const { oracledb } = require('../config/db');
 
 // Calculating the total availability of a specific crop among all farmers
 const calculateTotalAvailability = async (cropName) => {
   let connection;
   try {
-    connection = await require('../config/db').oracledb.getConnection();
-    
+    connection = await oracledb.getConnection("default");
+
     const result = await connection.execute(
       `SELECT SUM(c.produce_yield) as total_availability
        FROM crops c
@@ -22,7 +23,7 @@ const calculateTotalAvailability = async (cropName) => {
       { crop_name: cropName },
       { outFormat: require('../config/db').oracledb.OUT_FORMAT_OBJECT }
     );
-    
+
     return result.rows[0]?.TOTAL_AVAILABILITY || 0;
   } finally {
     if (connection) {
@@ -39,8 +40,8 @@ const calculateTotalAvailability = async (cropName) => {
 const getFarmersWithCrop = async (cropName) => {
   let connection;
   try {
-    connection = await require('../config/db').oracledb.getConnection();
-    
+    connection = await oracledb.getConnection("default");
+
     const result = await connection.execute(
       `SELECT 
           u.id as user_id,
@@ -61,7 +62,7 @@ const getFarmersWithCrop = async (cropName) => {
       { crop_name: cropName },
       { outFormat: require('../config/db').oracledb.OUT_FORMAT_OBJECT }
     );
-    
+
     return result.rows;
   } finally {
     if (connection) {
@@ -78,13 +79,13 @@ const getFarmersWithCrop = async (cropName) => {
 const updateCropAvailability = async (cropId, newAvailability) => {
   let connection;
   try {
-    connection = await require('../config/db').oracledb.getConnection();
-    
+    connection = await oracledb.getConnection("default");
+
     await connection.execute(
       `UPDATE crops SET produce_yield = :availability WHERE id = :crop_id`,
       { availability: newAvailability, crop_id: cropId }
     );
-    
+
     await connection.commit();
     return true;
   } catch (error) {
@@ -101,7 +102,7 @@ const updateCropAvailability = async (cropId, newAvailability) => {
   }
 };
 
-// Update user last visited date - USING YOUR VERSION
+// Update user last visited date
 const updateUserLastVisited = async (userId) => {
   try {
     await User.updateLastVisited(userId, new Date());
@@ -116,110 +117,107 @@ const createAutoOrder = catchAsyncErrors(async (req, res, next) => {
   const adminId = req.user.id;
   const { crops } = req.body;
 
-  // Validate input
   if (!crops || !Array.isArray(crops) || crops.length === 0) {
-    return next(new ErrorHandler('Please provide an array of crops with quantities', 400));
+    return next(new ErrorHandler('Please provide a list of crops with quantities', 400));
   }
 
-  // Check if user is admin
   const adminUser = await User.findById(adminId);
-  if (!adminUser || adminUser.ROLE !== 'admin') {
+  if (!adminUser || adminUser.role !== 'admin') {
     return next(new ErrorHandler('Only admins can create auto orders', 403));
   }
 
+  let connection;
   let orders = [];
   let unfulfilled = [];
 
-  // Process each crop in the request
-  for (const { crop: cropName, quantity } of crops) {
-    if (!cropName || !quantity || quantity <= 0) {
-      unfulfilled.push({ 
-        crop: cropName, 
-        shortfall: quantity,
-        reason: 'Invalid crop name or quantity' 
-      });
-      continue;
-    }
+  try {
+    connection = await oracledb.getConnection('default');
+    await connection.execute('BEGIN NULL; END;'); // ensure session valid
+    await connection.execute('SAVEPOINT batch_start');
 
-    // Calculate total availability for this crop
-    const totalAvailability = await calculateTotalAvailability(cropName);
-    
-    if (totalAvailability < quantity) {
-      unfulfilled.push({ 
-        crop: cropName, 
-        shortfall: quantity - totalAvailability,
-        total_available: totalAvailability
-      });
-      continue;
-    }
+    for (const cropOrder of crops) {
+      const { crop: cropName, quantity, unit = 'kg' } = cropOrder;
+      const unitDisplay = Crop.getUnitDisplayName(unit);
+      const quantityInKg = Crop.convertToKg(quantity, unit);
 
-    // Get farmers with this crop, sorted by last visited (least recently visited first)
-    const farmersWithCrop = await getFarmersWithCrop(cropName);
-    
-    let remainingQuantity = quantity;
-    const cropOrders = [];
+      const farmers = await connection.execute(
+        `
+        SELECT u.id as USER_ID, u.name as USER_NAME, c.id as CROP_ID, c.produce_yield as AVAILABILITY
+        FROM crops c
+        JOIN farms f ON c.farm_id = f.id
+        JOIN users u ON f.user_id = u.id
+        WHERE c.crop_name = :crop_name AND u.role = 'user' AND c.produce_yield > 0
+        ORDER BY u.last_visited ASC NULLS FIRST
+      `,
+        { crop_name: cropName },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
 
-    // Distribute the order quantity among farmers
-    for (let farmer of farmersWithCrop) {
-      if (remainingQuantity <= 0) break;
-
-      const availableQuantity = farmer.AVAILABILITY;
-      if (availableQuantity <= 0) continue;
-
-      const assignedQuantity = Math.min(remainingQuantity, availableQuantity);
-      const newAvailability = availableQuantity - assignedQuantity;
-      remainingQuantity -= assignedQuantity;
-
-      try {
-        // Update crop availability
-        await updateCropAvailability(farmer.CROP_ID, newAvailability);
-
-        // Update user's last visited date - USING YOUR VERSION
-        await updateUserLastVisited(farmer.USER_ID);
-
-        // Create the order
-        const orderId = await Order.create({
-          admin_id: adminId,
-          crop_id: farmer.CROP_ID,
-          quantity: assignedQuantity,
-          status: 'pending'
-        });
-
-        // Get the full order details
-        const newOrder = await Order.findById(orderId);
-        cropOrders.push(newOrder);
-
-      } catch (error) {
-        console.error(`Error processing order for farmer ${farmer.USER_ID}:`, error);
-        // If there's an error with one farmer, add the quantity back to unfulfilled
-        remainingQuantity += assignedQuantity;
+      const farmerList = farmers.rows;
+      if (farmerList.length === 0) {
+        unfulfilled.push({ crop: cropName, reason: 'No farmers found' });
         continue;
       }
 
-      if (remainingQuantity <= 0) break;
+      let remaining = quantityInKg;
+
+      for (const farmer of farmerList) {
+        if (remaining <= 0) break;
+
+        const assignable = Math.min(farmer.AVAILABILITY, remaining);
+        const newAvailability = farmer.AVAILABILITY - assignable;
+
+        await connection.execute(
+          `UPDATE crops SET produce_yield = :newAvail WHERE id = :cropId`,
+          { newAvail: newAvailability, cropId: farmer.CROP_ID },
+          { autoCommit: false }
+        );
+
+        const newOrder = await Order.create(
+          {
+            admin_id: adminId,
+            crop_id: farmer.CROP_ID,
+            user_id: farmer.USER_ID,
+            quantity: assignable,
+            original_quantity: Crop.convertFromKg(assignable, unit),
+            original_unit: unit,
+            original_unit_display: unitDisplay,
+            status: 'pending',
+          },
+          connection
+        );
+
+        orders.push(newOrder);
+        remaining -= assignable;
+      }
+
+      if (remaining > 0) {
+        unfulfilled.push({
+          crop: cropName,
+          shortfall: Crop.convertFromKg(remaining, unit),
+          unit_display: unitDisplay,
+          reason: 'Partial fulfillment',
+        });
+      }
     }
 
-    // If we still have remaining quantity due to errors, add to unfulfilled
-    if (remainingQuantity > 0) {
-      unfulfilled.push({ 
-        crop: cropName, 
-        shortfall: remainingQuantity,
-        reason: 'Distribution error' 
-      });
-    }
+    await connection.commit();
 
-    orders = orders.concat(cropOrders);
+    res.status(201).json({
+      success: true,
+      message: 'Auto order batch processed successfully',
+      data: {
+        orders_created: orders.length,
+        unfulfilled_requests: unfulfilled.length > 0 ? unfulfilled : null,
+      },
+    });
+  } catch (error) {
+    if (connection) await connection.rollback();
+    console.error('AutoOrder transaction failed:', error);
+    return next(new ErrorHandler(`Transaction failed: ${error.message}`, 500));
+  } finally {
+    if (connection) await connection.close().catch(console.error);
   }
-
-  res.status(201).json({
-    success: true,
-    message: 'Auto order processing completed',
-    data: {
-      orders_created: orders.length,
-      orders: orders,
-      unfulfilled_requests: unfulfilled.length > 0 ? unfulfilled : null
-    }
-  });
 });
 
 // Get crop availability report
@@ -228,14 +226,14 @@ const getCropAvailabilityReport = catchAsyncErrors(async (req, res, next) => {
 
   // Check if user is admin
   const adminUser = await User.findById(adminId);
-  if (!adminUser || adminUser.ROLE !== 'admin') {
+  if (!adminUser || adminUser.role !== 'admin') {
     return next(new ErrorHandler('Only admins can view crop availability reports', 403));
   }
 
   let connection;
   try {
-    connection = await require('../config/db').oracledb.getConnection();
-    
+    connection = await oracledb.getConnection("default");
+
     const result = await connection.execute(
       `SELECT 
           c.crop_name,
@@ -281,7 +279,7 @@ const getCropAvailabilityDetails = catchAsyncErrors(async (req, res, next) => {
 
   // Check if user is admin
   const adminUser = await User.findById(adminId);
-  if (!adminUser || adminUser.ROLE !== 'admin') {
+  if (!adminUser || adminUser.role !== 'admin') {
     return next(new ErrorHandler('Only admins can view crop availability details', 403));
   }
 
@@ -305,8 +303,71 @@ const getCropAvailabilityDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// Get available crops with their units and quantities
+const getAvailableCrops = catchAsyncErrors(async (req, res, next) => {
+  const adminId = req.user.id;
+
+  // Check if user is admin
+  const adminUser = await User.findById(adminId);
+  if (!adminUser || adminUser.role !== 'admin') {
+    return next(new ErrorHandler('Only admins can view available crops', 403));
+  }
+
+  let connection;
+  try {
+    connection = await oracledb.getConnection("default");
+
+    const result = await connection.execute(
+      `SELECT DISTINCT 
+              c.crop_name,
+              c.unit_of_measure,
+              c.unit_conversion_factor,
+              SUM(c.produce_yield) as total_availability,
+              COUNT(DISTINCT f.id) as farm_count,
+              COUNT(DISTINCT u.id) as farmer_count
+       FROM crops c
+       JOIN farms f ON c.farm_id = f.id
+       JOIN users u ON f.user_id = u.id
+       WHERE u.role = 'user'
+         AND c.produce_yield > 0
+       GROUP BY c.crop_name, c.unit_of_measure, c.unit_conversion_factor
+       ORDER BY c.crop_name`,
+      {},
+      { outFormat: require('../config/db').oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    // Format the response with unit information
+    const availableCrops = result.rows.map(row => ({
+      crop_name: row.CROP_NAME,
+      unit_of_measure: row.UNIT_OF_MEASURE || 'kg',
+      unit_conversion_factor: row.UNIT_CONVERSION_FACTOR || 1,
+      total_availability: row.TOTAL_AVAILABILITY,
+      farm_count: row.FARM_COUNT,
+      farmer_count: row.FARMER_COUNT,
+      available_units: Crop.getRecommendedUnits(row.CROP_NAME)
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        available_crops: availableCrops,
+        total_crops: availableCrops.length
+      }
+    });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }
+});
+
 module.exports = {
   createAutoOrder,
   getCropAvailabilityReport,
-  getCropAvailabilityDetails
+  getCropAvailabilityDetails,
+  getAvailableCrops
 };

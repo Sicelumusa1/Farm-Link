@@ -1,0 +1,366 @@
+/* Container & Wrapper */
+.quick-transaction-form {
+  width: 100%;
+  max-width: 1200px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin: 1rem auto;
+}
+
+/* Themes */
+.quick-transaction-form.light {
+  --bg: #ffffff;
+  --text: #283712;
+  --muted: #666;
+  --border: #b1b1b1;
+  --hover: rgba(0,0,0,0.05);
+  --primary: #0575E6;
+  --success: #28a745;
+  --error: #dc3545;
+  --warning: #ffc107;
+  --header-bg: #f8f9fa;
+}
+
+.quick-transaction-form.dark {
+  --bg: #1e1e1e;
+  --text: #ebebeb;
+  --muted: #aaa;
+  --border: #444;
+  --hover: rgba(255,255,255,0.05);
+  --primary: #0575E6;
+  --success: #218838;
+  --error: #dc3545;
+  --warning: #ffc107;
+  --header-bg: #2d2d2d;
+}
+
+/* Header */
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.transaction-header h5 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Form Styles */
+.quick-transaction-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Type Selection */
+.type-selection {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.type-btn {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.type-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.type-btn.active {
+  border-color: var(--primary);
+  color: var(--text-light);
+  transform: translateY(-1px);
+}
+
+.type-btn.expense.active {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-color: #ef4444;
+}
+
+.type-btn.income.active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: #10b981;
+}
+
+/* Form Groups */
+.amount-input,
+.crop-selection,
+.quick-categories,
+.description-input,
+.date-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quick-transaction-form label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+/* Input Fields */
+.quick-transaction-form input,
+.quick-transaction-form select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.quick-transaction-form input:focus,
+.quick-transaction-form select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(5, 117, 230, 0.25);
+}
+
+.quick-transaction-form input:hover,
+.quick-transaction-form select:hover {
+  border-color: var(--primary);
+}
+
+/* Amount Input Specific */
+.amount-input input {
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text);
+}
+
+.amount-input input::placeholder {
+  color: var(--muted);
+  font-weight: normal;
+}
+
+/* Quick Categories */
+.quick-categories .category-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.category-btn {
+  padding: 0.75rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.category-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(5, 117, 230, 0.3);
+}
+
+/* Description Input */
+.description-input input {
+  font-size: 0.95rem;
+}
+
+.description-input input::placeholder {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Submit Button */
+.submit-btn {
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), #004e9e);
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--primary-hover, #0068d0), #003d7a);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5, 117, 230, 0.4);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  background: var(--muted);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .quick-transaction-form {
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 0.5rem;
+  }
+  
+  .transaction-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .transaction-header h5 {
+    font-size: 1.1rem;
+  }
+  
+  .type-selection {
+    flex-direction: column;
+  }
+  
+  .quick-categories .category-buttons {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+  
+  .category-btn {
+    padding: 0.875rem;
+    font-size: 0.85rem;
+  }
+  
+  .quick-transaction-form form {
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-transaction-form {
+    padding: 1rem;
+  }
+  
+  .transaction-header h5 {
+    font-size: 1rem;
+  }
+  
+  .quick-transaction-form input,
+  .quick-transaction-form select,
+  .type-btn,
+  .submit-btn {
+    padding: 0.875rem;
+  }
+  
+  .amount-input input {
+    font-size: 1.1rem;
+  }
+}
+
+/* Animation for form submission */
+@keyframes submitting {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.submit-btn:disabled {
+  animation: submitting 1.5s ease-in-out infinite;
+}
+
+/* Focus states for accessibility */
+.quick-transaction-form input:focus-visible,
+.quick-transaction-form select:focus-visible,
+.type-btn:focus-visible,
+.category-btn:focus-visible,
+.submit-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar for dropdown */
+.quick-transaction-form select {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--header-bg);
+}
+
+.quick-transaction-form select::-webkit-scrollbar {
+  width: 6px;
+}
+
+.quick-transaction-form select::-webkit-scrollbar-track {
+  background: var(--header-bg);
+  border-radius: 3px;
+}
+
+.quick-transaction-form select::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 3px;
+}
+
+.quick-transaction-form select::-webkit-scrollbar-thumb:hover {
+  background: #0069d9;
+}
+
+/* Animation for form elements */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.quick-transaction-form form > * {
+  animation: fadeIn 0.3s ease-out;
+}

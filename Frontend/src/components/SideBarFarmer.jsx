@@ -24,11 +24,11 @@ export default function SideBarFarmer({setNavItem}) {
           <FontAwesomeIcon icon={faWheatAwn} className="icon" />
           <p className="item-title produce">Produce</p>
         </div>
-        <div className={`item-container 1 ${theme}`} onClick={() => setNavItem('produce')}>
+        <div className={`item-container 1 ${theme}`} onClick={() => setNavItem('analytics')}>
           <FontAwesomeIcon icon={faLineChart} className="icon" />
           <p className="item-title produce">Analytics</p>
         </div>
-        <div className={`item-container 1 ${theme}`} onClick={() => setNavItem('produce')}>
+        <div className={`item-container 1 ${theme}`} onClick={() => setNavItem('finance')}>
           <FontAwesomeIcon icon={faMoneyBills} className="icon" />
           <p className="item-title produce">Finances</p>
         </div>

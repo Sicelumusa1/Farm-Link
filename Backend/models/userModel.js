@@ -1,11 +1,21 @@
 const { oracledb } = require('../config/db');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 const User = {
+  // Hash password using crypto
+  hashPassword(password) {
+    return crypto.createHash('sha256').update(password).digest('hex');
+  },
+
+  // Compare password using crypto
+  comparePassword(enteredPassword, storedHash) {
+    const enteredHash = crypto.createHash('sha256').update(enteredPassword).digest('hex');
+    return enteredHash === storedHash;
+  },
+
   async create({ name, email, password, phone, role }) {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = this.hashPassword(password);
     let connection;
 
     try {
@@ -40,7 +50,8 @@ const User = {
     try {
       connection = await oracledb.getConnection("default");
       const result = await connection.execute(
-        `SELECT id, name, email, password, phone, role, created_at 
+        `SELECT id, name, email, password, phone, role, created_at, last_visited, 
+                has_provided_farm_details, admin_municipality, admin_city 
          FROM users WHERE email = :email`,
         { email },
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
@@ -55,12 +66,15 @@ const User = {
           phone: result.rows[0].PHONE,
           role: result.rows[0].ROLE,
           createdAt: result.rows[0].CREATED_AT,
-          hasProvidedFarmDetails: result.rows[0].HAS_PROVIDED_FARM_DETAILS,
+          lastVisited: result.rows[0].LAST_VISITED,
+          hasProvidedFarmDetails: result.rows[0].HAS_PROVIDED_FARM_DETAILS === 1,
+          adminMunicipality: result.rows[0].ADMIN_MUNICIPALITY,
+          adminCity: result.rows[0].ADMIN_CITY,
           getJwtToken: function () {
-          return jwt.sign({ id: this.id }, process.env.JWT_SECRET, { 
-            expiresIn: process.env.JWT_EXPIRY_TIME || '7d' 
-          });
-        }
+            return jwt.sign({ id: this.id }, process.env.JWT_SECRET, { 
+              expiresIn: process.env.JWT_EXPIRY_TIME || '7d' 
+            });
+          }
         };
       }
       return null;
@@ -124,10 +138,6 @@ const User = {
     } finally {
       if (connection) await connection.close().catch(err => console.error(err));
     }
-  },
-
-  async comparePassword(enteredPassword, storedHash) {
-    return bcrypt.compare(enteredPassword, storedHash);
   },
 
   generateJwtToken(userId) {

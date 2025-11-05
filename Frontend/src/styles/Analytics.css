@@ -1,0 +1,109 @@
+/* Container & Wrapper */
+.analytics-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  width: 100%;
+}
+
+.analytics-wrapper {
+  width: 100%;
+  max-width: 900px;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Themes */
+.analytics-wrapper.light {
+  --bg: #ffffff;
+  --text: #333;
+  --muted: #666;
+  --border: #ddd;
+  --hover: rgba(0,0,0,0.05);
+}
+
+.analytics-wrapper.dark {
+  --bg: #1e1e1e;
+  --text: #ebebeb;
+  --muted: #aaa;
+  --border: #444;
+  --hover: rgba(255,255,255,0.05);
+}
+
+/* Header */
+.analytics-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.analytics-main-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.analytics-subtitle {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* Tab Selectors */
+.analytics-selectors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.analytics-selector {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.analytics-selector:hover {
+  background-color: var(--hover);
+}
+
+.analytics-selector.active {
+  border-color: #0575E6;
+  background: rgba(5, 117, 230, 0.08);
+}
+
+.analytics-selector-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/*Content Section*/
+.analytics-content {
+  margin-top: 1rem;
+}
+
+/* Loading State */
+.loading {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .analytics-wrapper {
+    padding: 1.5rem;
+  }
+
+  .analytics-main-title {
+    font-size: 1.5rem;
+  }
+
+  .analytics-selectors {
+    grid-template-columns: 1fr;
+  }
+}

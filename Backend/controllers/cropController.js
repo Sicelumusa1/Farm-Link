@@ -210,48 +210,260 @@ const getAllCrops = catchAsyncErrors(async (req, res, next) => {
 });
 
 // Upload crop image
+
 const uploadCropImage = catchAsyncErrors(async (req, res, next) => {
   const cropId = req.params.id;
   const userId = req.user.id;
+  const { description, growth_stage } = req.body;
 
   // Validate file
   if (!req.file) {
     return next(new ErrorHandler('Please upload an image', 400));
   }
 
+  // Verify crop exists and belongs to user
   const existingCrop = await Crop.findById(parseInt(cropId));
   if (!existingCrop) {
     return next(new ErrorHandler('Crop not found', 404));
   }
 
+  // Verify that the crop belongs to the user's farm
   const farm = await Farm.findByUserId(userId);
   if (!farm || farm.ID !== existingCrop.FARM_ID) {
     return next(new ErrorHandler('Access denied to this crop', 403));
   }
 
-  const ns = process.env.OCI_NAMESPACE;
-  const bucketName = process.env.OCI_BUCKET;
-  const objectName = `crops/${cropId}/${Date.now()}-${req.file.originalname}`;
+  try {
+    // Generate unique object name for OCI
+    const fileExtension = path.extname(req.file.originalname);
+    const objectName = `crops/${cropId}/${Date.now()}${fileExtension}`;
 
-  const uploadedObjectName = await uploadToOracleBucket(bucketName, req.file.path, objectName);
+    // Upload to OCI bucket
+    const uploadResult = await oracleStorage.uploadImage(req.file.path, objectName);
+    
+    // Get public URL
+    const imageUrl = await oracleStorage.getImageUrl(objectName);
 
-  const namespace = await (await import('../utils/oracleStorage.js')).getNamespace?.() || ns;
-  const imageUrl = getPublicURL(namespace, bucketName, uploadedObjectName);
+    // Store image metadata in database
+    const imageId = await Crop.addCropImage(
+      parseInt(cropId), 
+      imageUrl, 
+      description, 
+      growth_stage
+    );
 
-  // Store image URL in your crops table
-  const connection = await require('../config/db').oracledb.getConnection();
-  await connection.execute(
-    `UPDATE crop_images SET url = :url WHERE id = :id`,
-    { url: imageUrl, id: cropId }
-  );
-  await connection.commit();
-  await connection.close();
+    res.status(200).json({
+      success: true,
+      message: 'Image uploaded successfully',
+      data: {
+        imageId,
+        imageUrl,
+        objectName: uploadResult.objectName
+      }
+    });
+  } catch (error) {
+    // Clean up uploaded file if database operation fails
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+    return next(new ErrorHandler('Failed to upload image: ' + error.message, 500));
+  }
+});
+
+// Get crop images
+const getCropImages = catchAsyncErrors(async (req, res, next) => {
+  const cropId = req.params.id;
+  const userId = req.user.id;
+
+  // Verify crop exists and belongs to user
+  const existingCrop = await Crop.findById(parseInt(cropId));
+  if (!existingCrop) {
+    return next(new ErrorHandler('Crop not found', 404));
+  }
+
+  // Verify that the crop belongs to the user's farm
+  const farm = await Farm.findByUserId(userId);
+  if (!farm || farm.ID !== existingCrop.FARM_ID) {
+    return next(new ErrorHandler('Access denied to this crop', 403));
+  }
+
+  const images = await Crop.getCropImages(parseInt(cropId));
 
   res.status(200).json({
     success: true,
-    message: 'Image uploaded successfully',
-    imageUrl
+    data: images,
+    count: images.length
   });
+});
+
+// Delete crop image
+const deleteCropImage = catchAsyncErrors(async (req, res, next) => {
+  const { id: cropId, imageId } = req.params;
+  const userId = req.user.id;
+
+  // Verify crop exists and belongs to user
+  const existingCrop = await Crop.findById(parseInt(cropId));
+  if (!existingCrop) {
+    return next(new ErrorHandler('Crop not found', 404));
+  }
+
+  // Verify that the crop belongs to the user's farm
+  const farm = await Farm.findByUserId(userId);
+  if (!farm || farm.ID !== existingCrop.FARM_ID) {
+    return next(new ErrorHandler('Access denied to this crop', 403));
+  }
+
+  await Crop.deleteCropImage(parseInt(cropId), parseInt(imageId));
+
+  res.status(200).json({
+    success: true,
+    message: 'Image deleted successfully'
+  });
+});
+
+// Get recommended units for a crop
+const getRecommendedUnits = catchAsyncErrors(async (req, res, next) => {
+  const { crop } = req.query;
+
+  if (!crop) {
+    return next(new ErrorHandler('Crop name is required', 400));
+  }
+
+  const recommendedUnits = Crop.getRecommendedUnits(crop);
+
+  res.status(200).json({
+    success: true,
+    data: recommendedUnits,
+    crop: crop
+  });
+});
+
+// Get unit conversions
+const getUnitConversions = catchAsyncErrors(async (req, res, next) => {
+  const conversions = Crop.getUnitConversions();
+
+  res.status(200).json({
+    success: true,
+    data: conversions
+  });
+});
+
+// Convert crop unit
+const convertCropUnit = catchAsyncErrors(async (req, res, next) => {
+  const cropId = req.params.id;
+  const userId = req.user.id;
+  const { new_unit } = req.body;
+
+  if (!new_unit) {
+    return next(new ErrorHandler('New unit is required', 400));
+  }
+
+  // Verify crop exists and belongs to user
+  const existingCrop = await Crop.findById(parseInt(cropId));
+  if (!existingCrop) {
+    return next(new ErrorHandler('Crop not found', 404));
+  }
+
+  // Verify that the crop belongs to the user's farm
+  const farm = await Farm.findByUserId(userId);
+  if (!farm || farm.ID !== existingCrop.FARM_ID) {
+    return next(new ErrorHandler('Access denied to this crop', 403));
+  }
+
+  const result = await Crop.convertCropQuantity(parseInt(cropId), new_unit);
+
+  res.status(200).json({
+    success: true,
+    data: result,
+    message: 'Unit converted successfully'
+  });
+});
+
+// Get available crops for marketplace
+const getAvailableCrops = catchAsyncErrors(async (req, res, next) => {
+  const crops = await Crop.getAvailableCrops();
+
+  res.status(200).json({
+    success: true,
+    data: crops,
+    count: crops.length
+  });
+});
+
+// Get crops by farm ID
+const getCropsByFarm = catchAsyncErrors(async (req, res, next) => {
+  const farmId = req.params.farmId;
+  const userId = req.user.id;
+
+  // Verify farm belongs to user
+  const farm = await Farm.findById(parseInt(farmId));
+  if (!farm || farm.USER_ID !== userId) {
+    return next(new ErrorHandler('Access denied to this farm', 403));
+  }
+
+  const crops = await Crop.findByFarmId(parseInt(farmId));
+
+  res.status(200).json({
+    success: true,
+    data: crops,
+    count: crops.length
+  });
+});
+
+// Search crops with filters
+const searchCrops = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user.id;
+  const { crop_name, growth_stage, start_date, end_date, farm_id } = req.query;
+
+  let connection;
+  try {
+    connection = await oracledb.getConnection("default");
+    
+    let query = `
+      SELECT c.*, f.name as farm_name 
+      FROM crops c 
+      JOIN farms f ON c.farm_id = f.id 
+      WHERE f.user_id = :user_id
+    `;
+    const binds = { user_id: userId };
+
+    if (crop_name) {
+      query += ` AND UPPER(c.crop_name) LIKE UPPER(:crop_name)`;
+      binds.crop_name = `%${crop_name}%`;
+    }
+
+    if (growth_stage) {
+      query += ` AND c.growth_stage = :growth_stage`;
+      binds.growth_stage = growth_stage;
+    }
+
+    if (start_date) {
+      query += ` AND c.plant_date >= :start_date`;
+      binds.start_date = new Date(start_date);
+    }
+
+    if (end_date) {
+      query += ` AND c.plant_date <= :end_date`;
+      binds.end_date = new Date(end_date);
+    }
+
+    if (farm_id) {
+      query += ` AND c.farm_id = :farm_id`;
+      binds.farm_id = parseInt(farm_id);
+    }
+
+    query += ` ORDER BY c.plant_date DESC`;
+
+    const result = await connection.execute(query, binds, { outFormat: oracledb.OUT_FORMAT_OBJECT });
+    
+    res.status(200).json({
+      success: true,
+      data: result.rows,
+      count: result.rows.length
+    });
+  } finally {
+    if (connection) await connection.close();
+  }
 });
 
 module.exports = {
@@ -262,5 +474,13 @@ module.exports = {
   deleteCrop,
   updateCropGrowthStage,
   getAllCrops,
-  uploadCropImage
+  uploadCropImage,
+  getCropImages,
+  deleteCropImage,
+  getRecommendedUnits,
+  getUnitConversions,
+  convertCropUnit,
+  getAvailableCrops,
+  getCropsByFarm,
+  searchCrops
 };

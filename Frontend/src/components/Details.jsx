@@ -68,12 +68,12 @@ export default function Details() {
     try {
       setIsUpdating(true);
       
-      // Prepare update data - only send the field being updated
+      //  send the field being updated
       const updateData = {
         [fieldName]: formData[fieldName]
       };
 
-      // For coordinates, we need to send both latitude and longitude
+      //  send both latitude and longitude
       if (fieldName === 'latitude' || fieldName === 'longitude') {
         updateData.latitude = formData.latitude;
         updateData.longitude = formData.longitude;

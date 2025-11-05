@@ -301,3 +301,31 @@ tr, th {
     background-color: rgb(0, 155, 0);
     border: none;
 }
+
+.action-icons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.icon {
+  cursor: pointer;
+  font-size: 18px;
+  transition: color 0.2s ease-in-out;
+}
+
+.icon:hover {
+  color: var(--accent-color);
+}
+
+.edit-input {
+  width: 80px;
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.save-icon { color: green; }
+.cancel-icon { color: gray; }
+.edit-icon { color: #007bff; }
+.delete-icon { color: red; }

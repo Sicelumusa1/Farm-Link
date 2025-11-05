@@ -19,8 +19,8 @@ router.route('/profile/update').put(cookieJwtAuth, updateUserData);
 router.route('/profile/delete').delete(cookieJwtAuth, deleteUser);
 
 // Admin routes
-router.route('/admin/users').get(cookieJwtAuth, authorizedRoles, getUsers);
-router.route('/admin/users/:userId').get(cookieJwtAuth, authorizedRoles, getUserDetails);
-router.route('/admin/users/:userId').delete(cookieJwtAuth, authorizedRoles, adminDeleteUser);
+router.route('/admin/users').get(cookieJwtAuth, authorizedRoles('admin'), getUsers);
+router.route('/admin/users/:userId').get(cookieJwtAuth, authorizedRoles('admin'), getUserDetails);
+router.route('/admin/users/:userId').delete(cookieJwtAuth, authorizedRoles('admin'), adminDeleteUser);
 
 module.exports = router;

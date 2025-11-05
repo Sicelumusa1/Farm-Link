@@ -239,60 +239,222 @@ const deleteUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Admin only methods
 
-// Show all users : /api/v1/users
+// getUsers function with enhanced search
 const getUsers = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user.id;
 
-  // Check if user is admin
-  const currentUser = await User.findById(userId);
-  if (!currentUser || currentUser.role !== 'admin') {
-    return next(new ErrorHandler('Access denied. Admin privileges required.', 403));
-  }
-
-  // Basic filtering and pagination (simplified version)
-  const { page = 1, limit = 10, search = '' } = req.query;
-  const offset = (page - 1) * limit;
+  console.log('=== GET USERS CALLED - ENHANCED SEARCH ===');
 
   let connection;
   try {
     connection = await require('../config/db').oracledb.getConnection();
     
-    // Get total count
-    const countResult = await connection.execute(
-      `SELECT COUNT(*) as total FROM users WHERE role != 'admin'`,
-      {},
+    // Get current user data directly from database
+    const userResult = await connection.execute(
+      `SELECT id, name, role, admin_municipality, admin_city 
+       FROM users WHERE id = :id`,
+      { id: userId },
       { outFormat: require('../config/db').oracledb.OUT_FORMAT_OBJECT }
     );
+
+    if (userResult.rows.length === 0) {
+      return next(new ErrorHandler('User not found', 404));
+    }
+
+    const currentUser = userResult.rows[0];
     
+    if (currentUser.ROLE !== 'admin') {
+      return next(new ErrorHandler('Access denied. Admin privileges required.', 403));
+    }
+
+    // Check if admin has set municipality
+    if (!currentUser.ADMIN_MUNICIPALITY) {
+      console.log('Admin has NOT set municipality - returning requiresLocation');
+      return res.status(200).json({
+        success: true,
+        requiresLocation: true,
+        message: 'Admin needs to set municipality first',
+        data: []
+      });
+    }
+
+    console.log('Admin HAS set municipality:', currentUser.ADMIN_MUNICIPALITY);
+    
+    const { page = 1, limit = 10, search = '' } = req.query;
+    const offset = (page - 1) * limit;
+
+    // Build the main query with enhanced search
+    let usersQuery = `
+      SELECT 
+        u.id, 
+        u.name as farmer_name, 
+        u.email, 
+        u.phone, 
+        u.role, 
+        u.created_at,
+        u.last_visited,
+        u.has_provided_farm_details,
+        f.name as farm_name,
+        f.id as farm_id,
+        f.farm_size,
+        f.municipality,
+        f.ward,
+        f.city,
+        f.latitude,
+        f.longitude
+      FROM users u
+      LEFT JOIN farms f ON u.id = f.user_id
+      WHERE u.role = 'user' 
+        AND f.municipality = :admin_municipality
+    `;
+
+    let binds = {
+      admin_municipality: currentUser.ADMIN_MUNICIPALITY
+    };
+
+    // Enhanced search functionality
+    if (search && search.trim() !== '') {
+      usersQuery += ` AND (
+        LOWER(u.name) LIKE LOWER(:search) OR
+        LOWER(f.name) LIKE LOWER(:search) OR
+        LOWER(f.ward) LIKE LOWER(:search) OR
+        EXISTS (
+          SELECT 1 FROM crops c 
+          WHERE c.farm_id = f.id 
+          AND LOWER(c.crop_name) LIKE LOWER(:search)
+        )
+      )`;
+      binds.search = `%${search}%`;
+    }
+
+    const finalQuery = usersQuery + ` ORDER BY u.created_at DESC`;
+
+    // Add pagination using ROWNUM
+    const paginatedQuery = `
+      SELECT * FROM (
+        SELECT a.*, ROWNUM rnum FROM (${finalQuery}) a 
+        WHERE ROWNUM <= :max_row
+      ) 
+      WHERE rnum > :min_row
+    `;
+
+    binds.max_row = parseInt(offset) + parseInt(limit);
+    binds.min_row = parseInt(offset);
+
+    console.log('Executing users query for municipality:', currentUser.ADMIN_MUNICIPALITY);
+    console.log('Search term:', search);
+    
+    const usersResult = await connection.execute(
+      paginatedQuery,
+      binds,
+      { outFormat: require('../config/db').oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    console.log('Found users:', usersResult.rows.length);
+
+    // Get crops for each farm
+    const usersWithDetails = await Promise.all(
+      usersResult.rows.map(async (user) => {
+        let crops = [];
+
+        try {
+          // Get crops for this farm
+          const cropsResult = await connection.execute(
+            `SELECT id, crop_name, produce_yield, growth_stage 
+             FROM crops WHERE farm_id = :farm_id`,
+            { farm_id: user.FARM_ID },
+            { outFormat: require('../config/db').oracledb.OUT_FORMAT_OBJECT }
+          );
+
+          crops = cropsResult.rows.map(crop => ({
+            _id: crop.ID,
+            cropName: crop.CROP_NAME,
+            availability: crop.PRODUCE_YIELD || 0,
+            growthStage: crop.GROWTH_STAGE
+          }));
+        } catch (cropError) {
+          console.error(`Error fetching crops for farm ${user.FARM_ID}:`, cropError.message);
+        }
+
+        // Build user object
+        const userObj = {
+          _id: user.ID,
+          name: user.FARMER_NAME, // Farmer's name
+          email: user.EMAIL,
+          phone: user.PHONE,
+          role: user.ROLE,
+          createdAt: user.CREATED_AT,
+          lastVisited: user.LAST_VISITED || null,
+          hasProvidedFarmDetails: user.HAS_PROVIDED_FARM_DETAILS === 1,
+          farm: user.FARM_ID ? {
+            id: user.FARM_ID,
+            name: user.FARM_NAME, // Farm name
+            farmSize: user.FARM_SIZE,
+            municipality: user.MUNICIPALITY,
+            ward: user.WARD,
+            city: user.CITY,
+            latitude: user.LATITUDE,
+            longitude: user.LONGITUDE,
+            displayLocation: `${user.CITY}, ${user.MUNICIPALITY} (Ward ${user.WARD})`,
+            crops: crops
+          } : null
+        };
+
+        return userObj;
+      })
+    );
+
+    // Get total count for pagination
+    let countQuery = `
+      SELECT COUNT(*) as total 
+      FROM users u
+      LEFT JOIN farms f ON u.id = f.user_id
+      WHERE u.role = 'user' 
+        AND f.municipality = :admin_municipality
+    `;
+    
+    let countBinds = {
+      admin_municipality: currentUser.ADMIN_MUNICIPALITY
+    };
+
+    if (search && search.trim() !== '') {
+      countQuery += ` AND (
+        LOWER(u.name) LIKE LOWER(:search) OR
+        LOWER(f.name) LIKE LOWER(:search) OR
+        LOWER(f.ward) LIKE LOWER(:search) OR
+        EXISTS (
+          SELECT 1 FROM crops c 
+          WHERE c.farm_id = f.id 
+          AND LOWER(c.crop_name) LIKE LOWER(:search)
+        )
+      )`;
+      countBinds.search = `%${search}%`;
+    }
+
+    const countResult = await connection.execute(
+      countQuery,
+      countBinds,
+      { outFormat: require('../config/db').oracledb.OUT_FORMAT_OBJECT }
+    );
+
     const total = countResult.rows[0].TOTAL;
 
-    // Get users with farm info
-    const usersResult = await connection.execute(
-      `SELECT u.*, 
-              f.name as farm_name,
-              f.id as farm_id,
-              (SELECT COUNT(*) FROM crops c WHERE c.farm_id = f.id) as crop_count
-       FROM users u
-       LEFT JOIN farms f ON u.id = f.user_id
-       WHERE u.role != 'admin'
-       ORDER BY u.created_at DESC
-       OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY`,
-      { offset: parseInt(offset), limit: parseInt(limit) },
-      { outFormat: require('../config/db').oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    const users = usersResult.rows;
+    console.log('Successfully returning users data with enhanced search');
 
     res.status(200).json({
       success: true,
-      results: users.length,
+      results: usersWithDetails.length,
       total,
       page: parseInt(page),
       pages: Math.ceil(total / limit),
-      data: users
+      adminMunicipality: currentUser.ADMIN_MUNICIPALITY,
+      data: usersWithDetails
     });
+
+  } catch (error) {
+    console.error('Error in getUsers:', error);
+    return next(new ErrorHandler(`Failed to fetch users: ${error.message}`, 500));
   } finally {
     if (connection) {
       try {
@@ -331,7 +493,7 @@ const getUserDetails = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Get user's orders
-  const orders = await Order.findByFarmerId(parseInt(userId));
+  const orders = await Order.findByIdWithDetails(userId);
 
   // Get user's deliveries
   const deliveries = await Delivery.findByUserId(parseInt(userId));

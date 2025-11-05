@@ -1,20 +1,19 @@
-/* eslint-disable react/prop-types */
 import { useContext, useState } from 'react'
 import '../styles/Members.css'
 import Farmers from './Farmers';
 import Farmer from './Farmer';
 import Orders from './Orders';
 import { ThemeContext } from '../contexts/ThemeContext';
-import { SelectedFarmerContext } from '../contexts/SelectedFarmerContext';
+import { useSelectedFarmer } from '../contexts/SelectedFarmerContext';
 
-export default function Members({  showOrderForm, setShowOrderForm }) {
+export default function Members() {
   const [selected, setSelected] = useState('farmers');
   const { theme } = useContext(ThemeContext);
-  const { selectedFarmer, setSelectedFarmer } = useContext(SelectedFarmerContext);
+  const { selectedFarmer, setSelectedFarmer, showOrderForm, setShowOrderForm } = useSelectedFarmer();
 
   const handleOrderClose = () => {
     setShowOrderForm(false);
-    selectedFarmer(null);
+    setSelectedFarmer(null);
   }
 
   return (
@@ -24,7 +23,7 @@ export default function Members({  showOrderForm, setShowOrderForm }) {
           <h1 className={`members-title-title ${theme}`}>Members</h1>
         </div>
         <div className={`members-nav-container ${theme}`}>
-          <div className={selected  ? (`farmers-container2 ${theme}`) : (`farmers-container ${theme}`)} onClick={() => setSelected('farmers')}>
+          <div className={selected ? (`farmers-container2 ${theme}`) : (`farmers-container ${theme}`)} onClick={() => setSelected('farmers')}>
             <p className={`members-farmers-title ${theme}`}>Farmers</p>
           </div>
         </div>
@@ -38,7 +37,7 @@ export default function Members({  showOrderForm, setShowOrderForm }) {
             onOrderClick={() => setShowOrderForm(true)}
           />
         )}
-        {(!selectedFarmer && <Farmers setSelectedFarmer={ setSelectedFarmer } />)}
+        {(!selectedFarmer && <Farmers />)}
       </div>
     </div>
   )

@@ -1,0 +1,246 @@
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.summary-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--card-accent);
+  transition: all 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.summary-card:hover::before {
+  height: 6px;
+}
+
+/* Card Icons */
+.summary-card svg {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--card-icon);
+  transition: all 0.3s ease;
+}
+
+.summary-card:hover svg {
+  transform: scale(1.1);
+}
+
+/* Card Titles */
+.summary-card h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 0.75rem 0;
+}
+
+/* Amount Styles */
+.summary-card .amount {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--card-text);
+  margin: 0;
+  transition: all 0.3s ease;
+}
+
+.amount.positive {
+  color: var(--success);
+}
+
+.amount.negative {
+  color: var(--error);
+}
+
+/* Individual Card Themes */
+.income-card {
+  --card-accent: var(--success);
+  --card-icon: var(--success);
+  --card-text: var(--success);
+}
+
+.expense-card {
+  --card-accent: var(--error);
+  --card-icon: var(--error);
+  --card-text: var(--error);
+}
+
+.net-card {
+  --card-accent: var(--primary);
+  --card-icon: var(--primary);
+  --card-text: var(--text);
+}
+
+/* Light Theme */
+.summary-cards.light {
+  --card-bg: #ffffff;
+  --border: #e1e5e9;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --muted: #6b7280;
+  --text: #1f2937;
+  --primary: #0575E6;
+  --success: #10b981;
+  --error: #ef4444;
+}
+
+/* Dark Theme */
+.summary-cards.dark {
+  --card-bg: #2d2d2d;
+  --border: #404040;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --muted: #9ca3af;
+  --text: #f3f4f6;
+  --primary: #3b82f6;
+  --success: #10b981;
+  --error: #ef4444;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .summary-cards {
+    gap: 1rem;
+  }
+  
+  .summary-card {
+    padding: 1.25rem;
+  }
+  
+  .summary-card .amount {
+    font-size: 1.5rem;
+  }
+  
+  .summary-card svg {
+    font-size: 1.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .summary-card {
+    padding: 1.5rem;
+    flex-direction: row;
+    text-align: left;
+    gap: 1rem;
+  }
+  
+  .summary-card svg {
+    margin-bottom: 0;
+    font-size: 2rem;
+  }
+  
+  .summary-card-content {
+    flex: 1;
+  }
+  
+  .summary-card h3 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .summary-card .amount {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-cards {
+    gap: 0.75rem;
+  }
+  
+  .summary-card {
+    padding: 1.25rem;
+    gap: 0.75rem;
+  }
+  
+  .summary-card svg {
+    font-size: 1.5rem;
+  }
+  
+  .summary-card .amount {
+    font-size: 1.25rem;
+  }
+  
+  .summary-card h3 {
+    font-size: 0.8rem;
+  }
+}
+
+/* Animation for card entrance */
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.summary-card {
+  animation: cardSlideIn 0.5s ease-out;
+}
+
+.summary-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.summary-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.summary-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Focus states for accessibility */
+.summary-card:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .summary-cards {
+    break-inside: avoid;
+  }
+  
+  .summary-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  
+  .summary-card:hover {
+    transform: none;
+  }
+}

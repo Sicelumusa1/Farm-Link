@@ -1,4 +1,3 @@
-
 const { oracledb } = require('../config/db');
 
 const Delivery = {
@@ -9,15 +8,15 @@ const Delivery = {
       connection = await oracledb.getConnection();
       
       const result = await connection.execute(
-        `INSERT INTO deliveries (user_id, name, crop_id, address, date) 
-         VALUES (:user_id, :name, :crop_id, :address, :date) 
+        `INSERT INTO deliveries (user_id, name, crop_id, address, delivery_date) 
+         VALUES (:user_id, :name, :crop_id, :address, :delivery_date) 
          RETURNING id INTO :id`,
         {
           user_id,
           name,
           crop_id,
           address,
-          date: new Date(date),
+          delivery_date: new Date(date),
           id: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
         }
       );
@@ -59,7 +58,14 @@ const Delivery = {
         { delivery_id },
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
-      return result.rows[0];
+      
+      // Map delivery_date back to date for frontend compatibility
+      if (result.rows[0]) {
+        const delivery = result.rows[0];
+        delivery.DATE = delivery.DELIVERY_DATE;
+        return delivery;
+      }
+      return null;
     } finally {
       if (connection) {
         try {
@@ -86,11 +92,16 @@ const Delivery = {
          JOIN crops c ON d.crop_id = c.id
          JOIN farms f ON c.farm_id = f.id
          WHERE d.user_id = :user_id
-         ORDER BY d.date DESC, d.created_at DESC`,
+         ORDER BY d.delivery_date DESC, d.created_at DESC`,
         { user_id },
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
-      return result.rows;
+      
+      // Map delivery_date back to date for each row
+      return result.rows.map(row => {
+        row.DATE = row.DELIVERY_DATE;
+        return row;
+      });
     } finally {
       if (connection) {
         try {
@@ -118,11 +129,16 @@ const Delivery = {
          JOIN crops c ON d.crop_id = c.id
          JOIN farms f ON c.farm_id = f.id
          JOIN users u ON d.user_id = u.id
-         ORDER BY d.date DESC, d.created_at DESC`,
+         ORDER BY d.delivery_date DESC, d.created_at DESC`,
         {},
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
-      return result.rows;
+      
+      // Map delivery_date back to date for each row
+      return result.rows.map(row => {
+        row.DATE = row.DELIVERY_DATE;
+        return row;
+      });
     } finally {
       if (connection) {
         try {
@@ -156,8 +172,8 @@ const Delivery = {
         binds.address = address;
       }
       if (date !== undefined) {
-        fields.push('date = :date');
-        binds.date = new Date(date);
+        fields.push('delivery_date = :delivery_date');
+        binds.delivery_date = new Date(date);
       }
 
       if (fields.length === 0) {
@@ -221,11 +237,16 @@ const Delivery = {
          FROM deliveries d
          JOIN users u ON d.user_id = u.id
          WHERE d.crop_id = :crop_id
-         ORDER BY d.date DESC`,
+         ORDER BY d.delivery_date DESC`,
         { crop_id },
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
-      return result.rows;
+      
+      // Map delivery_date back to date for each row
+      return result.rows.map(row => {
+        row.DATE = row.DELIVERY_DATE;
+        return row;
+      });
     } finally {
       if (connection) {
         try {
@@ -248,11 +269,16 @@ const Delivery = {
          JOIN crops c ON d.crop_id = c.id
          JOIN users u ON d.user_id = u.id
          WHERE c.farm_id = :farm_id
-         ORDER BY d.date DESC`,
+         ORDER BY d.delivery_date DESC`,
         { farm_id },
         { outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
-      return result.rows;
+      
+      // Map delivery_date back to date for each row
+      return result.rows.map(row => {
+        row.DATE = row.DELIVERY_DATE;
+        return row;
+      });
     } finally {
       if (connection) {
         try {

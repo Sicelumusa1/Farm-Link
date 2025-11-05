@@ -1,0 +1,339 @@
+/* IncomeExpenseChart.css */
+
+.chart-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.chart-card h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Recharts Customization */
+.chart-card .recharts-cartesian-grid-horizontal line,
+.chart-card .recharts-cartesian-grid-vertical line {
+  stroke: var(--grid-color);
+  stroke-dasharray: 3 3;
+}
+
+.chart-card .recharts-x-axis .recharts-cartesian-axis-tick-value,
+.chart-card .recharts-y-axis .recharts-cartesian-axis-tick-value {
+  fill: var(--axis-text);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.chart-card .recharts-x-axis .recharts-cartesian-axis-line,
+.chart-card .recharts-y-axis .recharts-cartesian-axis-line {
+  stroke: var(--axis-line);
+}
+
+.chart-card .recharts-legend-wrapper {
+  bottom: -10px !important;
+}
+
+.chart-card .recharts-default-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.chart-card .recharts-legend-item {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.chart-card .recharts-legend-item-text {
+  color: var(--text) !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+}
+
+.chart-card .recharts-default-tooltip {
+  background: var(--tooltip-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.chart-card .recharts-tooltip-label {
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.chart-card .recharts-tooltip-item {
+  color: var(--text) !important;
+  font-size: 0.85rem !important;
+}
+
+.chart-card .recharts-tooltip-item-name {
+  font-weight: 500 !important;
+}
+
+.chart-card .recharts-tooltip-item-value {
+  font-weight: 600 !important;
+}
+
+/* Custom line styles */
+.chart-card .recharts-line-curve {
+  stroke-width: 3px;
+}
+
+.chart-card .recharts-line-dots circle {
+  r: 4px;
+  stroke-width: 2px;
+  fill: var(--card-bg);
+  transition: all 0.2s ease;
+}
+
+.chart-card .recharts-line-dots circle:hover {
+  r: 6px;
+  stroke-width: 3px;
+}
+
+/* Light Theme */
+.chart-card.light {
+  --card-bg: #ffffff;
+  --border: #e1e5e9;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --text: #1f2937;
+  --grid-color: #f1f5f9;
+  --axis-text: #6b7280;
+  --axis-line: #e5e7eb;
+  --tooltip-bg: #ffffff;
+}
+
+.chart-card.light .income-line {
+  stroke: #10b981;
+  stroke-width: 3px;
+}
+
+.chart-card.light .expense-line {
+  stroke: #ef4444;
+  stroke-width: 3px;
+}
+
+.chart-card.light .recharts-line-dots circle.income-dot {
+  stroke: #10b981;
+}
+
+.chart-card.light .recharts-line-dots circle.expense-dot {
+  stroke: #ef4444;
+}
+
+/* Dark Theme */
+.chart-card.dark {
+  --card-bg: #2d2d2d;
+  --border: #404040;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --text: #f3f4f6;
+  --grid-color: #374151;
+  --axis-text: #9ca3af;
+  --axis-line: #4b5563;
+  --tooltip-bg: #374151;
+}
+
+.chart-card.dark .income-line {
+  stroke: #34d399;
+  stroke-width: 3px;
+}
+
+.chart-card.dark .expense-line {
+  stroke: #f87171;
+  stroke-width: 3px;
+}
+
+.chart-card.dark .recharts-line-dots circle.income-dot {
+  stroke: #34d399;
+}
+
+.chart-card.dark .recharts-line-dots circle.expense-dot {
+  stroke: #f87171;
+}
+
+/* Empty State */
+.chart-card.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  color: var(--muted);
+}
+
+.chart-card.empty h4 {
+  margin-bottom: 0.5rem;
+}
+
+.chart-card.empty p {
+  font-size: 0.9rem;
+  margin: 0;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .chart-card {
+    padding: 1.25rem;
+  }
+  
+  .chart-card h4 {
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .chart-card {
+    padding: 1rem;
+    border-radius: 10px;
+  }
+  
+  .chart-card h4 {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  
+  .chart-card .recharts-legend-wrapper {
+    bottom: -15px !important;
+  }
+  
+  .chart-card .recharts-default-legend {
+    gap: 1rem;
+  }
+  
+  .chart-card .recharts-legend-item-text {
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-card {
+    padding: 0.875rem;
+  }
+  
+  .chart-card h4 {
+    font-size: 0.9rem;
+  }
+  
+  .chart-card .recharts-default-legend {
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .chart-card .recharts-legend-item-text {
+    font-size: 0.7rem !important;
+  }
+}
+
+/* Animation for chart entrance */
+@keyframes chartSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chart-card {
+  animation: chartSlideIn 0.6s ease-out;
+}
+
+/* Focus states for accessibility */
+.chart-card:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .chart-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  
+  .chart-card .income-line {
+    stroke: #059669;
+  }
+  
+  .chart-card .expense-line {
+    stroke: #dc2626;
+  }
+}
+
+/* Loading state */
+.chart-card.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  color: var(--muted);
+}
+
+.chart-card.loading::after {
+  content: 'Loading chart...';
+  font-size: 0.9rem;
+}
+
+/* Custom tooltip styles */
+.custom-tooltip {
+  background: var(--tooltip-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-tooltip .label {
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.custom-tooltip .item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.custom-tooltip .color-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.custom-tooltip .income-indicator {
+  background: var(--income-color);
+}
+
+.custom-tooltip .expense-indicator {
+  background: var(--expense-color);
+}

@@ -142,13 +142,26 @@ CREATE TABLE deliveries (
     name VARCHAR2(100) NOT NULL,
     crop_id NUMBER NOT NULL,
     address VARCHAR2(255) NOT NULL,
-    date DATE NOT NULL,
+    delivery_date DATE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (crop_id) REFERENCES crops(id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE deliveries IS 'Stores delivery information for orders';
+
+CREATE TABLE farm_transactions (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    farm_id NUMBER NOT NULL REFERENCES farms(id),
+    type VARCHAR2(10) CHECK (type IN ('income', 'expense')),
+    crop_id NUMBER REFERENCES crops(id),
+    category VARCHAR2(50) NOT NULL,
+    amount NUMBER(10,2) NOT NULL,
+    description VARCHAR2(500),
+    transaction_date DATE NOT NULL,
+    created_by NUMBER NOT NULL REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
 -- Create indexes for better performance
 CREATE INDEX idx_users_email ON users(email);
@@ -167,6 +180,10 @@ CREATE INDEX idx_orders_created_at ON orders(created_at);
 CREATE INDEX idx_deliveries_user_id ON deliveries(user_id);
 CREATE INDEX idx_deliveries_crop_id ON deliveries(crop_id);
 CREATE INDEX idx_deliveries_date ON deliveries(date);
+CREATE INDEX idx_farm_transactions_farm_date ON farm_transactions(farm_id, transaction_date);
+CREATE INDEX idx_farm_transactions_crop ON farm_transactions(crop_id);
+CREATE INDEX idx_farm_transactions_type ON farm_transactions(type);
+CREATE INDEX idx_farm_transactions_category ON farm_transactions(category);
 
 -- Create sequences for ID generation (backup for IDENTITY columns)
 CREATE SEQUENCE users_seq START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
@@ -176,24 +193,6 @@ CREATE SEQUENCE crop_images_seq START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE orders_seq START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 CREATE SEQUENCE deliveries_seq START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
 
--- Insert sample admin user
-INSERT INTO users (name, email, password, phone, role) VALUES (
-    'System Administrator',
-    'admin@farmlink.com',
-    '$2b$10$ExampleHashedPassword123456789012',
-    '+27123456789',
-    'admin'
-);
-
--- Insert sample farmer user
-INSERT INTO users (name, email, password, phone, role, has_provided_farm_details) VALUES (
-    'John Farmer',
-    'farmer@example.com',
-    '$2b$10$ExampleHashedPassword123456789012',
-    '+27123456780',
-    'user',
-    1
-);
 
 COMMIT;
 

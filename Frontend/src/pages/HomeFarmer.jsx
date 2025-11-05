@@ -10,6 +10,8 @@ import { UserContext } from '../contexts/UserContext'
 import { FarmPopUp } from '../components/FarmPopUp'
 import { profile } from '../services/ProfileService'
 import { allFarmerDatails } from '../services/farmerService'
+import FinancialDashboard from '../components/FinancialDashboard'
+import Analytics from '../components/Analytics'
 
 export default function HomeFarmer() {
   const { theme } = useContext(ThemeContext);
@@ -101,6 +103,8 @@ export default function HomeFarmer() {
         <SideBarFarmer setNavItem={setFarmerNavItem} currentNavItem={farmerNavItem} />
         {farmerNavItem === 'profile' && <Profile />}
         {farmerNavItem === 'produce' && <Produce />}
+        {farmerNavItem === 'analytics' && <Analytics />}
+        {farmerNavItem === 'finance' && <FinancialDashboard />}
         {farmerNavItem === 'settings' && <Settings />}
       </div>
     </div>

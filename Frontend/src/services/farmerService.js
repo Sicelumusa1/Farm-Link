@@ -12,7 +12,7 @@ export const usersData = async (params = {}) => {
 
 
 
-export const farmerDatails = async (userId) => {
+export const farmerDetails = async (userId) => {
   //pulls farmer's details by ID
   try {
     const response = await axiosInstance.get(`/api/v1/admin/users/${userId}`);

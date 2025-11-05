@@ -2,15 +2,17 @@ const express = require('express');
 const {
   createAutoOrder,
   getCropAvailabilityReport,
-  getCropAvailabilityDetails
+  getCropAvailabilityDetails,
+  getAvailableCrops
 } = require('../controllers/autoOrderController');
-const {cookieJwtAuth, authorizedRoles } = require('../middleware/crackCookie');
+const { cookieJwtAuth, authorizedRoles } = require('../middleware/crackCookie');
 
 const router = express.Router();
 
 // Admin routes for auto ordering
-router.post('/auto-orders', cookieJwtAuth, authorizedRoles, createAutoOrder);
-router.get('/crops/availability-report', cookieJwtAuth, authorizedRoles, getCropAvailabilityReport);
-router.get('/crops/:cropName/availability-details', cookieJwtAuth, authorizedRoles, getCropAvailabilityDetails);
+router.route('/create').post(cookieJwtAuth, authorizedRoles('admin'), createAutoOrder);
+router.route('/availability-report').get(cookieJwtAuth, authorizedRoles('admin'), getCropAvailabilityReport);
+router.route('/availability-details/:cropName').get(cookieJwtAuth, authorizedRoles('admin'), getCropAvailabilityDetails); // Fixed parameter order
+router.route('/available-crops').get(cookieJwtAuth, authorizedRoles('admin'), getAvailableCrops);
 
 module.exports = router;

@@ -6,21 +6,23 @@ const {
   getFarmerOrders,
   updateOrder,
   deleteOrder,
-  updateOrderStatus
+  updateOrderStatus,
+  acknowledgeOrder
 } = require('../controllers/orderController');
-const {cookieJwtAuth, authorizedRoles } = require('../middleware/crackCookie');
+const { cookieJwtAuth, authorizedRoles } = require('../middleware/crackCookie');
 
 const router = express.Router();
 
 // Admin routes
-router.post('/orders', cookieJwtAuth, authorizedRoles, createOrder);
-router.get('/orders/admin', cookieJwtAuth, authorizedRoles, getOrders);
-router.put('/orders/:id', cookieJwtAuth, authorizedRoles, updateOrder);
-router.delete('/orders/:id', cookieJwtAuth, authorizedRoles, deleteOrder);
-router.patch('/orders/:orderId/status', cookieJwtAuth, authorizedRoles, updateOrderStatus);
+router.route('/orders').post(cookieJwtAuth, authorizedRoles('admin'), createOrder);
+router.route('/orders/admin').get(cookieJwtAuth, authorizedRoles('admin'), getOrders);
+router.route('/orders/:id').put(cookieJwtAuth, authorizedRoles('admin'), updateOrder);
+router.route('/orders/:id').delete(cookieJwtAuth, authorizedRoles('admin'), deleteOrder);
 
-// Farmer routes
-router.get('/orders', cookieJwtAuth, getFarmerOrders);
-router.get('/orders/:id', cookieJwtAuth, getOrder);
+// Farmer order management routes
+router.route('/orders').get(cookieJwtAuth, getFarmerOrders);
+router.route('/orders/:id').get(cookieJwtAuth, getOrder);
+router.route('/orders/:orderId/status').patch(cookieJwtAuth, updateOrderStatus);
+router.route('/orders/:orderId/acknowledge').patch(cookieJwtAuth, acknowledgeOrder);
 
 module.exports = router;

@@ -1,753 +1,636 @@
+/* ===== VARIABLES ===== */
+:root {
+  /* Colors */
+  --primary-color: #283712;
+  --secondary-color: #0575E6;
+  --danger-color: #d32f2f;
+  --success-color: #2e7d32;
+  --warning-color: #856404;
+  --info-color: #0c5460;
+  
+  /* Neutral Colors */
+  --text-light: #283712;
+  --text-dark: #efefef;
+  --text-muted: #585858;
+  --text-muted-dark: #a0aec0;
+  --border-color: #D9D9D9;
+  --border-dark: #4a5568;
+  --background-light: #ffffff;
+  --background-dark: #212121;
+  --background-gray: #f5f5f5;
+  --background-gray-dark: #2d3748;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Border Radius */
+  --border-radius: 7px;
+  --border-radius-sm: 4px;
+  
+  /* Typography */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+}
+
+/* ===== BASE STYLES ===== */
 .orders-container {
-    width: 100%;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.orders-title {
-    padding: 35px 0 15px 0px;
-}
-
-.orders-title h1 {
-    font-size: 27px;
-    font-weight: 500;
-    color: #283712;
-}
-
-.orders-title.dark h1 {
-    font-size: 27px;
-    font-weight: 500;
-    color: #efefef;
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .orders-wrapper {
-    width: auto;
-    display: flex;
-    flex-direction: column;
-    padding: 0 50px;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-xl);
 }
 
+.orders-title {
+  padding: var(--spacing-xl) 0 var(--spacing-lg) 0;
+}
+
+.orders-title h1 {
+  font-size: var(--font-size-xl);
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.orders-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  margin-top: var(--spacing-xs);
+}
+
+/* ===== NAVIGATION ===== */
 .orders-nav-container {
-    width: 100%;
-    height: 30px;
-    display: flex;
-    justify-content: left;
-    align-items: end;
-    border-bottom: 2px solid #b1b1b1;
-    color: #283712;
-    margin: 0;
+  width: 100%;
+  height: 30px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--border-color);
+  color: var(--text-light);
+  margin: 0;
 }
-
-.orders-nav-container.dark {
-    width: 100%;
-    height: 30px;
-    display: flex;
-    justify-content: left;
-    align-items: end;
-    border-bottom: 2px solid #efefef;
-    color: #283712;
-    margin: 0;
-}
-
 
 .orders-title-container {
-    cursor: pointer;
-    padding-bottom: 7px;
-    margin: 0 15px -3px 0;
-    color: #0575E6;
-    border-bottom: 3px solid #0575E6;
+  cursor: pointer;
+  padding-bottom: var(--spacing-sm);
+  margin: 0 var(--spacing-lg) -3px 0;
+  color: var(--secondary-color);
+  border-bottom: 3px solid var(--secondary-color);
 }
 
-.orders-title-container.dark {
-    cursor: pointer;
-    padding-bottom: 7px;
-    margin: 0 15px -3px 0;
-    color: #ffffff;
-    border-bottom: 3px solid #ffffff;
-}
-
-.order-form-container{
-    width: 100%;
-    height: 300px;
-    overflow-y: auto;
-    margin-top: 30px;
-}
-
-.produce-form-container {
-    width: auto;
-    height: 300px;
-    overflow-y: auto;
-    margin-top: 30px;
-    margin-right: 50px;
-    margin-left: 50px;
-}
+/* ===== FORM LAYOUT ===== */
 .order-selectors {
-    display: flex;
-    margin-top: 30px;
+  display: flex;
+  margin-top: var(--spacing-xl);
+  gap: var(--spacing-md);
 }
 
-.order-selectors.dark {
-    display: flex;
-    margin-top: 30px;
-    color: #efefef;
+.orders-s-crop-type-container,
+.orders-s-quality-container {
+  position: relative;
 }
 
-.orders-s-crop-type-container, .orders-s-plantDate-container, .orders-s-harvestDate-container {
-    width: 191px;
-    position: relative;
-    margin-right: 20px;
+.order-s-crops-title,
+.order-s-quantity-title {
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-md);
+  font-weight: 450;
 }
 
-.orders-s-crop-type-btn.dark {
-    width: 191px;
-    position: relative;
-    margin-right: 20px;
-    background-color: #ffffff;
+/* ===== FORM CONTROLS ===== */
+.orders-s-crop-type-btn,
+.orders-s-quantity-input-group {
+  width: 180px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--background-light);
 }
 
-
-.crop-type-dropDown.light, .plantDate-dropDown {
-    position: absolute;
-    width: 100%;
-    height: auto;
-    background-color: #ffffff;
-    border: 1px solid #b1b1b1;
-    margin-top: 5px;
-    overflow-y: auto;
-    border-radius: 7px;
-    z-index: 1;
-    padding: 5px 0;
+.orders-s-quantity-input-group {
+  padding: 0 var(--spacing-sm);
+  gap: var(--spacing-xs);
 }
 
-.plantDate-dropDown {
-    height: 120px;
+.crop-type-sel,
+.orders-s-quantity-input-btn,
+.quantity-unit-select {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: var(--text-muted);
 }
 
-.crop-type-dropDown p {
-    margin-bottom: 5px;
-    padding: 0 0 0 10px;
+.quantity-unit-select {
+  min-width: 120px;
+  padding: var(--spacing-xs);
 }
 
-.crop-type-dropDown.dark {
-    position: absolute;
-    width: 100%;
-    height: auto;
-    border: 1px solid #b1b1b1;
-    margin-top: 5px;
-    overflow-y: auto;
-    border-radius: 7px;
-    z-index: 1;
-    padding: 5px 0;
-    background-color: #212121;
-}
-
-.crop-type-dropDown p:hover {
-    cursor: pointer;
-    background-color: #0575E6;
-    color: #ffffff;
-}
-
-.crop-type-dropDown p.dark:hover{
-    cursor: pointer;
-    background-color: #D9D9D9;
-    color: #ffffff;
-}
-
-.orders-s-farmer-btn, .orders-s-crop-type-btn, .orders-s-quantity-btn {
-    position: relative;
-    width: 120px;
-    height: 32px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    flex-direction: row;
-    font-size: 14px;
-    color: #585858;
-    border: 1px solid #D9D9D9;
-    border-radius: 7px;
-    padding-left: 10px;
-    margin-right: 20px;
-}
-
-.orders-s-farmer-btn, .orders-s-crop-type-btn, .orders-s-quantity-btn {
-    position: relative;
-    width: 120px;
-    height: 32px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    flex-direction: row;
-    font-size: 14px;
-    color: #585858;
-    border: 1px solid #D9D9D9;
-    border-radius: 7px;
-    padding-left: 10px;
-    margin-right: 20px;
-}
-
-.orders-s-quantity-btn.dark {
-    position: relative;
-    width: 100px;
-    height: 32px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    flex-direction: row;
-    font-size: 14px;
-    color: #585858;
-    border: 1px solid #D9D9D9;
-    background-color: #ffffff;
-    border-radius: 7px;
-    padding-left: 10px;
-    margin-right: 20px;
-}
-
-.produce-s-quantity-btn-input.dark {
-    background-color: #ffffff;
-    
-}
-.orders-s-farmer-btn:hover, .orders-s-crop-type-btn:hover, .orders-s-quantity-btn:hover, .orders-s-plantDate-btn:hover {
-    cursor: pointer;
-}
-.orders-s-farmer-btn {
-    width: 240px;
-}
-
-.orders-s-crop-type-btn, .orders-s-plantDate-btn {
-    width: 180px;
-}
-
-.orders-s-type-container {
-    width: 180px;
-    position: relative;
-    margin-right: 20px;
-  }
-  
-  .orders-s-type-btn {
-    width: 180px;
-    height: 32px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    font-size: 14px;
-    color: #585858;
-    border: 1px solid #D9D9D9;
-    border-radius: 7px;
-    padding-left: 10px;
-    cursor: pointer;
-  }
-  
-  .orders-s-type-btn.dark {
-    background-color: #ffffff;
-    color: #585858;
-  }
-  
-  .orders-s-type-btn select {
-    width: 100%;
-    height: 100%;
-    border: none;
-    outline: none;
-    background-color: transparent;
-    cursor: pointer;
-  }
-  .orders-s-image-container {
-    width: 180px;
-    position: relative;
-    margin-right: 20px;
-  }
-  
-  .orders-s-image-btn {
-    width: 180px;
-    height: 32px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    font-size: 14px;
-    color: #585858;
-    border: 1px solid #D9D9D9;
-    border-radius: 7px;
-    padding-left: 10px;
-    cursor: pointer;
-  }
-  
-  .orders-s-image-btn.dark {
-    background-color: #ffffff;
-    color: #585858;
-  }
-  
-  .orders-s-image-btn input[type="file"] {
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    cursor: pointer;
-  }
-  .add-produce-container {
-    width: 70px;
-    height: 30px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    border: 1px solid #D9D9D9;
-    border-radius: 7px;
-    margin-top: 10px;
-    cursor: pointer;
-    background-color: #ffffff;
-    color: #585858;
-  }
-  
-  .add-produce-container.dark {
-    background-color: #212121;
-    color: #efefef;
-  }
-  
-  .add-produce-container:hover {
-    background-color: #0575E6;
-    color: #ffffff;
-  }
-  
-  .add-produceIcon {
-    margin-left: 10px;
-    font-size: 12px;
-    font-weight: 450;
-    color: #585858;
-    margin-right: 5px;
-  }
-  
-  .add-produceIcon.dark {
-    color: #efefef;
-  }
-  .guidelines-btn-container {
-    margin-top: 10px;
-  }
-  .guidelines-btn {
-    width: 120px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid #D9D9D9;
-    border-radius: 7px;
-    cursor: pointer;
-    background-color: #ffffff;
-    color: #585858;
-  }
-  .guidelines-btn.dark {
-    background-color: #212121;
-    color: #efefef;
-  }
-  .guidelines-btn:hover {
-    background-color: #0575e6;
-    color: #ffffff;
-  }
-  .guidelines-icon {
-    margin-right: 5px;
-  }
-  .produce-title-container hr {
-    height: 1px;
-    background-color: #e2e2e2;
-    border: none;
-  }
-.produce-item-title {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 0.5fr;
-    align-items: center;
-    font-size: max(1vw,12px);
-  }
-
-
-.orders-s-crop-type-btn.dark, .orders-s-plantDate-btn.dark {
-    width: 180px;
-}
-
-.orders-s-quantity-btn {
-    width: 100px;
-    padding-right: 10px;
-}
-
-.orders-s-quantity-btn input {
-    width: 100%;
-    height: 100%;
-    border: none;
-    outline: none;
-
-}
-
-.crop-type-sel.dark, .orders-s-quantity-input-btn.dark, .orders-s-quantity-btn.dark {
-    background-color: #212121;
-    color: #efefef;
-}
-
-.orders-arrowIcon, .orders-arrowIcon2 {
-    position: absolute;
-    right: 0;
-    margin-right: 4px;
-    font-size: 12px;
-    transform: rotate(180deg);
-}
-
-.orders-arrowIcon2 {
-    top: 50%;
-    font-size: 14px;
-    color: #585858;
-    margin-top: 5px;
-}
-
-.order-s-farmer-title, .order-s-crops-title, .order-s-quantity-title, .order-s-plantDate-title, .order-s-harvestDate-title {
-    margin-bottom: 7px;
-    font-size: 15px;
-    font-weight: 450;
-}
-
+/* ===== BUTTONS ===== */
 .place-order-btn-container {
-    width: auto;
-    height: auto;
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
 }
 
-.add-order-container, .add-produce-container, .cancel-order-container {
-    width: 70px;
-    height: 30px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    border: 1px solid #D9D9D9;
-    border-radius: 7px;
-    margin-top: 10px;
+.add-order-container,
+.cancel-order-container {
+  width: auto;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 0 var(--spacing-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  min-width: 70px;
+}
+
+.add-order-container {
+  justify-content: flex-start;
+  background-color: var(--background-light);
+  color: var(--text-muted);
 }
 
 .cancel-order-container {
-    justify-content: center;
-    margin-left: 10px;
-    color: #585858;
+  justify-content: center;
+  color: var(--text-muted);
 }
 
-.add-produce-container.dark {
-    width: 70px;
-    height: 30px;
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    border: 1px solid #D9D9D9;
-    border-radius: 7px;
-    margin-top: 10px;
-    color: #efefef;
+.add-orderIcon {
+  margin-right: var(--spacing-xs);
+  font-size: var(--font-size-sm);
 }
 
-.add-orderIcon, .add-produceIcon {
-    margin-left: 10px;
-    font-size: 12px;
-    font-weight: 450;
-    color: #585858;
-    margin-right: 5px;
-}
-
-.add-produceIcon.dark {
-    margin-left: 10px;
-    font-size: 12px;
-    font-weight: 450;
-    color: #efefef;
-    margin-right: 5px;
-}
-
-.add-orderIcon:hover, .add-produceIcon:hover {
-    color: #ffffff;
-}
-
-.add-order-container p, .add-produceIcon p {
-    font-size: 14px;
-    font-weight: 450;
-    color: #585858;
-}
-
-.add-order-container:hover, .add-order-btn-container p:hover {
-    cursor: pointer;
-    background-color: #0575E6;
-    color: #ffffff;
+.add-order-container:hover {
+  background-color: var(--secondary-color);
+  color: var(--background-light);
 }
 
 .cancel-order-container:hover {
-    cursor: pointer;
-    background-color: rgb(235, 0, 0);
-    color: #ffffff;
+  background-color: var(--danger-color);
+  color: var(--background-light);
 }
 
-.add-produce-container:hover {
-    cursor: pointer;
-    color: #ffffff;
-    background-color: #0575E6;
+.add-order-container.disabled,
+.cancel-order-container.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
+
+.cancel-order-container.submitting {
+  background-color: #6c757d;
+  color: var(--background-light);
+}
+
+/* ===== ORDER SUMMARY ===== */
 .order-form-container {
-    width: auto;
+  width: 100%;
+  margin-top: var(--spacing-xl);
 }
 
-.produce-title-container {
-    width: 100%;
-    height: auto;
-    display: flex;
-    color: #b1b1b1;
-    margin-bottom: 8px;
+.order-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding: 0 var(--spacing-md);
 }
 
-.produce-title-container p {
-    font-size: 16px;
+.order-summary-header h3 {
+  margin: 0;
 }
 
-.produce-title-produce {
-    width: 780px;
+.order-output-container {
+  max-height: 300px;
+  overflow-y: auto;
 }
 
-.product-title-produce-container {
-    width: auto;
-    display: flex;
-    justify-content: end;
+.order-output-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 0.5fr;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--background-gray);
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
 }
 
-.crop-type-sel {
-    width: 110%;
-    height: 100%;
-    margin-left: -10px;
-    color: #585858;
-    border: transparent;
-    border-radius: 6px;
-    text-decoration: none;
+.order-output-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 0.5fr;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+  font-size: var(--font-size-sm);
+  transition: var(--transition-fast);
 }
 
-/* AutoOrder crop persistance */
-    .order-output-header {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px;
-    }
-    .order-output-title {
-        flex: 1;
-    }
-    .order-output-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 5px 0;
-    }
-    .quantity-container {
-        display: flex;
-        align-items: center;
-    }
-    .remove-crop-icon {
-        cursor: pointer;
-        margin-left: 5px;
-    }
-    .order-output-item:hover {
-        background-color: #0575e6;
-        color: white;
-    }
+.order-output-item:last-child {
+  border-bottom: none;
+}
 
-/* Responsive*/
+.order-output-item:hover {
+  background-color: var(--secondary-color);
+  color: var(--background-light);
+}
 
+.crop-name {
+  font-weight: 600;
+}
+
+.crop-quantity {
+  font-weight: 500;
+}
+
+.crop-unit,
+.crop-available {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.remove-crop-icon {
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: var(--transition-fast);
+}
+
+.order-output-item:hover .remove-crop-icon {
+  color: var(--background-light);
+}
+
+/* ===== AVAILABILITY & UNIT HELP SECTION ===== */
+.availability-warning,
+.availability-success,
+.unit-help-section {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: var(--background-gray);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.availability-warning {
+  color: var(--danger-color);
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
+}
+
+.availability-success {
+  color: var(--success-color);
+  background-color: #e8f5e8;
+  border: 1px solid #c8e6c9;
+}
+
+.warning-icon,
+.success-icon,
+.info-icon {
+  font-size: var(--font-size-xs);
+  flex-shrink: 0;
+}
+
+.warning-icon {
+  color: var(--danger-color);
+}
+
+.success-icon {
+  color: var(--success-color);
+}
+
+.info-icon {
+  color: var(--secondary-color);
+}
+
+.warning-icon-small {
+  color: var(--danger-color);
+  margin-left: var(--spacing-xs);
+  font-size: 0.625rem;
+}
+
+.exceeding-quantity {
+  background-color: #ffebee !important;
+  border-left: 3px solid var(--danger-color);
+}
+
+.unit-help-text {
+  color: var(--text-muted);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.unit-conversion-help {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  margin: var(--spacing-xs) 0 0 0;
+  font-style: italic;
+}
+
+/* ===== MESSAGES & ALERTS ===== */
+.message-alert {
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.message-alert.success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: var(--success-color);
+}
+
+.message-alert.error {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: var(--danger-color);
+}
+
+.message-alert.warning {
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+  color: var(--warning-color);
+}
+
+.message-alert.info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: var(--info-color);
+}
+
+/* ===== ANIMATIONS ===== */
+.spinner {
+  animation: spin 1s linear infinite;
+  margin-right: var(--spacing-xs);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ===== DARK THEME ===== */
+.orders-title.dark h1,
+.orders-subtitle.dark {
+  color: var(--text-dark);
+}
+
+.orders-nav-container.dark {
+  border-bottom-color: var(--text-dark);
+  color: var(--text-dark);
+}
+
+.orders-title-container.dark {
+  color: var(--text-dark);
+  border-bottom-color: var(--text-dark);
+}
+
+.order-selectors.dark {
+  color: var(--text-dark);
+}
+
+.crop-type-sel.dark,
+.orders-s-quantity-input-btn.dark,
+.quantity-unit-select.dark {
+  background-color: var(--background-dark);
+  color: var(--text-dark);
+}
+
+.orders-s-crop-type-btn.dark,
+.orders-s-quantity-input-group.dark {
+  background-color: var(--background-dark);
+  border-color: var(--border-dark);
+}
+
+.add-order-container.dark {
+  background-color: var(--background-dark);
+  color: var(--text-dark);
+  border-color: var(--border-dark);
+}
+
+.order-output-header.dark {
+  background-color: var(--background-gray-dark);
+  color: var(--text-dark);
+}
+
+.order-output-item.dark {
+  border-bottom-color: var(--border-dark);
+}
+
+.crop-unit.dark,
+.crop-available.dark {
+  color: var(--text-muted-dark);
+}
+
+.availability-warning.dark,
+.availability-success.dark,
+.unit-help-section.dark {
+  background-color: var(--background-gray-dark);
+}
+
+.availability-warning.dark {
+  color: #ff8a8a;
+  background-color: #4a1f1f;
+  border-color: #5a151a;
+}
+
+.availability-success.dark {
+  color: #81c784;
+  background-color: #1f3a1f;
+  border-color: #0f4021;
+}
+
+.unit-help-text.dark {
+  color: var(--text-muted-dark);
+}
+
+.unit-conversion-help.dark {
+  color: var(--text-muted-dark);
+}
+
+.info-icon.dark {
+  color: #63b3ed;
+}
+
+.message-alert.success.dark {
+  background-color: var(--success-color);
+  border-color: #0f4021;
+  color: #d4edda;
+}
+
+.message-alert.error.dark {
+  background-color: var(--danger-color);
+  border-color: #5a151a;
+  color: #f8d7da;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1120px) {
-    .orders-container {
-        width: 90%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        max-width: 1200px;
-        margin: 0 auto;
-        overflow-y: scroll;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .orders-wrapper {
-        width: auto;
-        height: auto;
-        display: flex;
-        flex-direction: column;
-        padding: 0 50px;
-        
-    }
+  .orders-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
-    .orders-nav-container {
-        width: 100%;
-        height: 30px;
-        display: flex;
-        justify-content: left;
-        align-items: end;
-        border-bottom: 2px solid #b1b1b1;
-        color: #283712;
-        margin-bottom: -15px;
-    }
+  .orders-wrapper {
+    padding: 0 var(--spacing-xl);
+  }
 
-    .order-selectors {
-        overflow-y: auto;
-        overflow-x: none;
-        -webkit-overflow-scrolling: touch;
-    }
-    .order-selectors::-webkit-scrollbar {
-        width: 0;
-    }
+  .orders-nav-container {
+    margin-bottom: -var(--spacing-lg);
+  }
 
-    .orders-title {
-        padding: 35px 0 15px 0px;
-    }
-    
-    .orders-title h1 {
-        font-size: 20px;
-        font-weight: 500;
-        color: #283712;
-    }
-    
-    .orders-wrapper {
-        width: auto;
-        display: flex;
-        flex-direction: column;
-        padding: 0 50px;
-    }
+  .orders-title h1 {
+    font-size: var(--font-size-lg);
+  }
 
-    .order-selectors {
-        display: flex;
-        flex-direction: column;
-    }
+  .order-selectors {
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
-    .orders-s-farmer-btn, .orders-s-crop-type-btn, .orders-s-quantity-btn, .orders-s-crop-type-btn {
-        position: relative;
-        width: 180px;
-        height: 30px;
-        display: flex;
-        justify-content: left;
-        align-items: center;
-        flex-direction: row;
-        font-size: 14px;
-        color: #585858;
-        border: 1px solid #D9D9D9;
-        border-radius: 7px;
-        padding-left: 10px;
-        margin-right: 20px;
-        margin-bottom: 10px;
-    }
+  .order-selectors::-webkit-scrollbar {
+    width: 0;
+  }
 
-    .orders-s-plantDate-btn {
-        margin-bottom: 10px;
-    }
+  .orders-s-crop-type-btn,
+  .orders-s-quantity-input-group {
+    width: 180px;
+    height: 30px;
+    margin-bottom: var(--spacing-sm);
+  }
 
-    .plot-size {
-        margin-top: 10px;
-    }
-    .order-s-farmer-title, .order-s-crops-title, .order-s-quantity-title, .order-s-plantDate-title, .order-s-harvestDate-title {
-        margin-bottom: 5px;
-        font-size: 15px;
-        font-weight: 450;
-    }
-    .produce-form-container {
-        margin-top: 5px;
-    }
-    
-    .produce-form-container::-webkit-scrollbar {
-        width: 0;
-    }
+  .produce-form-container {
+    margin-top: var(--spacing-xs);
+  }
+
+  .produce-form-container::-webkit-scrollbar {
+    width: 0;
+  }
 }
 
-@media (max-width: 375px) {
-    .orders-container {
-        width: 90%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        max-width: 375px;
-        margin: 0 auto;
-        overflow-y: scroll;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .orders-wrapper {
-        width: auto;
-        height: auto;
-        display: flex;
-        flex-direction: column;
-        padding: 0 50px;
-        
-    }
+@media (max-width: 768px) {
+  .orders-wrapper {
+    padding: 0 var(--spacing-md);
+  }
 
-    .orders-nav-container {
-        width: 100%;
-        height: 30px;
-        display: flex;
-        justify-content: left;
-        align-items: end;
-        border-bottom: 2px solid #b1b1b1;
-        color: #283712;
-        margin-bottom: -15px;
-    }
+  .order-output-header,
+  .order-output-item {
+    grid-template-columns: 1.5fr 1fr 1fr 0.5fr;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
 
-    .order-selectors {
-        overflow-y: auto;
-        overflow-x: none;
-        -webkit-overflow-scrolling: touch;
-    }
-    .order-selectors::-webkit-scrollbar {
-        width: 0;
-    }
+  .order-output-header .order-output-title:nth-child(4),
+  .order-output-item .crop-available {
+    display: none;
+  }
+}
 
-    .orders-title {
-        padding: 35px 0 15px 0px;
-    }
-    
-    .orders-title h1 {
-        font-size: 20px;
-        font-weight: 500;
-        color: #283712;
-    }
-    
-    .orders-wrapper {
-        width: auto;
-        display: flex;
-        flex-direction: column;
-        padding: 0 50px;
-    }
+@media (max-width: 480px) {
+  .orders-wrapper {
+    padding: 0 var(--spacing-sm);
+  }
 
-    .order-selectors {
-        display: flex;
-        flex-direction: column;
-    }
+  .orders-title {
+    padding: var(--spacing-lg) 0 var(--spacing-md) 0;
+  }
 
-    .orders-s-farmer-btn, .orders-s-crop-type-btn, .orders-s-quantity-btn, .orders-s-crop-type-btn {
-        position: relative;
-        width: 180px;
-        height: 30px;
-        display: flex;
-        justify-content: left;
-        align-items: center;
-        flex-direction: row;
-        font-size: 14px;
-        color: #585858;
-        border: 1px solid #D9D9D9;
-        border-radius: 7px;
-        padding-left: 10px;
-        margin-right: 20px;
-        margin-bottom: 10px;
-    }
+  .orders-title h1 {
+    font-size: var(--font-size-md);
+  }
 
-    .orders-s-plantDate-btn {
-        margin-bottom: 10px;
-    }
+  .order-selectors {
+    margin-top: var(--spacing-lg);
+  }
 
-    .plot-size {
-        margin-top: 10px;
-    }
-    .order-s-farmer-title, .order-s-crops-title, .order-s-quantity-title, .order-s-plantDate-title, .order-s-harvestDate-title {
-        margin-bottom: 5px;
-        font-size: 15px;
-        font-weight: 450;
-    }
+  .place-order-btn-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
 
-    .add-order-container, .add-produce-container {
-        margin-top: -15px;
-    }
-    .produce-form-container {
-        margin-top: 5px;
-    }
-    
-    .produce-form-container::-webkit-scrollbar {
-        width: 0;
-    }
+  .add-order-container,
+  .cancel-order-container {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .order-output-header,
+  .order-output-item {
+    grid-template-columns: 1fr 1fr 0.5fr;
+    font-size: 0.75rem;
+  }
+
+  .order-output-header .order-output-title:nth-child(3),
+  .order-output-header .order-output-title:nth-child(4),
+  .order-output-item .crop-unit,
+  .order-output-item .crop-available {
+    display: none;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+  
+  .add-order-container,
+  .cancel-order-container,
+  .order-output-item {
+    transition: none;
+  }
+}
+
+/* Focus styles for better accessibility */
+.crop-type-sel:focus,
+.orders-s-quantity-input-btn:focus,
+.quantity-unit-select:focus {
+  outline: 2px solid var(--secondary-color);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .order-output-item:hover {
+    background-color: var(--text-light);
+    color: var(--background-light);
+    outline: 2px solid var(--background-light);
+  }
 }
